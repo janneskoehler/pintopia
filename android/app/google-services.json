@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "500161903549",
+    "project_id": "pintopia-2025",
+    "storage_bucket": "pintopia-2025.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500161903549:android:451c63c34f9a54788a30d4",
+        "android_client_info": {
+          "package_name": "com.example.pintopia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBz48DP3ZaX6oX4TnTfZfeladPX73b0orE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

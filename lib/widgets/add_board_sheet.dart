@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'create_board_form.dart';
+import '../services/firebase_service.dart';
 
 class AddBoardSheet extends StatefulWidget {
   const AddBoardSheet({super.key});
@@ -24,6 +25,7 @@ class _AddBoardSheetState extends State<AddBoardSheet> {
   String? selectedAssetImage;
   bool isCreatingNew = true;
   bool isSecondPage = false;
+  final FirebaseService _firebaseService = FirebaseService();
 
   @override
   void dispose() {
@@ -79,7 +81,10 @@ class _AddBoardSheetState extends State<AddBoardSheet> {
     if (selectedAssetImage == null) return;
 
     try {
-      // TODO: Implementiere Board-Erstellung
+      await _firebaseService.createWall(
+        nameController.text,
+        selectedAssetImage!,
+      );
       Navigator.pop(context);
     } catch (e) {
       showDialog(
