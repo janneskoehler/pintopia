@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
-import 'create_board_form.dart';
+import 'package:go_router/go_router.dart';
+import 'wall_form.dart';
 import '../services/firebase_service.dart';
+import '../services/storage_service.dart';
 
-class AddBoardSheet extends StatefulWidget {
-  const AddBoardSheet({super.key});
+class AddWallSheet extends StatefulWidget {
+  const AddWallSheet({super.key});
 
   static void show(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => const AddBoardSheet(),
+      builder: (context) => const AddWallSheet(),
     );
   }
 
   @override
-  State<AddBoardSheet> createState() => _AddBoardSheetState();
+  State<AddWallSheet> createState() => _AddWallSheetState();
 }
 
-class _AddBoardSheetState extends State<AddBoardSheet> {
+class _AddWallSheetState extends State<AddWallSheet> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController idController = TextEditingController();
   final PageController pageController = PageController();
@@ -26,6 +28,7 @@ class _AddBoardSheetState extends State<AddBoardSheet> {
   bool isCreatingNew = true;
   bool isSecondPage = false;
   final FirebaseService _firebaseService = FirebaseService();
+  final StorageService _storageService = StorageService();
 
   @override
   void dispose() {
@@ -65,7 +68,7 @@ class _AddBoardSheetState extends State<AddBoardSheet> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Fehlender Name'),
-            content: const Text('Bitte gib einen Namen für das Board ein.'),
+            content: const Text('Bitte gib einen Namen für die Pinnwand ein.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -81,18 +84,61 @@ class _AddBoardSheetState extends State<AddBoardSheet> {
     if (selectedAssetImage == null) return;
 
     try {
-      await _firebaseService.createWall(
+      final wall = await _firebaseService.createWall(
         nameController.text,
         selectedAssetImage!,
       );
-      Navigator.pop(context);
+
+      await _storageService.addWall(wall.id, isAdmin: true);
+      await _storageService.saveLastWallId(wall.id);
+
+      if (mounted) {
+        Navigator.pop(context);
+        context.goNamed(
+          'wall-detail',
+          pathParameters: {'id': wall.id},
+        );
+      }
     } catch (e) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Fehler'),
-            content: Text('Fehler beim Erstellen des Boards: $e'),
+            content: Text('Fehler beim Erstellen der Pinnwand: $e'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _openExistingBoard() async {
+    if (idController.text.isEmpty) return;
+
+    try {
+      final boardId = idController.text;
+      await _storageService.addWall(boardId);
+
+      if (mounted) {
+        Navigator.pop(context);
+        context.goNamed(
+          'wall-detail',
+          pathParameters: {'id': boardId},
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Fehler'),
+            content: Text('Fehler beim Öffnen der Pinnwand: $e'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -130,7 +176,7 @@ class _AddBoardSheetState extends State<AddBoardSheet> {
               ),
               Expanded(
                 child: Text(
-                  'Board hinzufügen',
+                  'Pinnwand hinzufügen',
                   style: Theme.of(context).textTheme.titleLarge,
                   textAlign: TextAlign.center,
                 ),
@@ -140,7 +186,9 @@ class _AddBoardSheetState extends State<AddBoardSheet> {
                 alignment: Alignment.centerRight,
                 child: isSecondPage
                     ? TextButton(
-                        onPressed: isCreatingNew ? _createNewBoard : null,
+                        onPressed: isCreatingNew
+                            ? _createNewBoard
+                            : _openExistingBoard,
                         style: TextButton.styleFrom(
                           minimumSize: Size.zero,
                           padding: const EdgeInsets.all(8),
@@ -168,7 +216,7 @@ class _AddBoardSheetState extends State<AddBoardSheet> {
                         style: FilledButton.styleFrom(
                           minimumSize: const Size.fromHeight(50),
                         ),
-                        child: const Text('Neues Board erstellen'),
+                        child: const Text('Neue Pinnwand erstellen'),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -188,7 +236,7 @@ class _AddBoardSheetState extends State<AddBoardSheet> {
                         style: OutlinedButton.styleFrom(
                           minimumSize: const Size.fromHeight(50),
                         ),
-                        child: const Text('Vorhandenes Board öffnen'),
+                        child: const Text('Vorhandene Pinnwand öffnen'),
                       ),
                     ],
                   ),
@@ -196,7 +244,7 @@ class _AddBoardSheetState extends State<AddBoardSheet> {
                 // Zweite Seite: Formular
                 SingleChildScrollView(
                   child: isCreatingNew
-                      ? CreateBoardForm(
+                      ? WallForm(
                           nameController: nameController,
                           selectedAssetImage: selectedAssetImage,
                           onAssetImageSelected: (assetName) {
@@ -208,8 +256,8 @@ class _AddBoardSheetState extends State<AddBoardSheet> {
                       : TextField(
                           controller: idController,
                           decoration: const InputDecoration(
-                            labelText: 'Board ID',
-                            hintText: 'Geben Sie die Board ID ein',
+                            labelText: 'Pinnwand ID',
+                            hintText: 'Geben Sie die Pinnwand ID ein',
                           ),
                         ),
                 ),

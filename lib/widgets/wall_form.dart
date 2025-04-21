@@ -1,12 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-class CreateBoardForm extends StatefulWidget {
+class WallForm extends StatefulWidget {
   final TextEditingController nameController;
   final String? selectedAssetImage;
   final Function(String) onAssetImageSelected;
 
-  const CreateBoardForm({
+  const WallForm({
     super.key,
     required this.nameController,
     required this.selectedAssetImage,
@@ -14,10 +14,10 @@ class CreateBoardForm extends StatefulWidget {
   });
 
   @override
-  State<CreateBoardForm> createState() => _CreateBoardFormState();
+  State<WallForm> createState() => _WallFormState();
 }
 
-class _CreateBoardFormState extends State<CreateBoardForm> {
+class _WallFormState extends State<WallForm> {
   bool _hasError = false;
 
   @override
@@ -39,8 +39,8 @@ class _CreateBoardFormState extends State<CreateBoardForm> {
         TextField(
           controller: widget.nameController,
           decoration: InputDecoration(
-            labelText: 'Name des Boards',
-            hintText: 'Geben Sie einen Namen ein',
+            labelText: 'Name der Pinnwand',
+            hintText: 'Gib einen Namen ein',
             errorText: _hasError ? 'Bitte geben Sie einen Namen ein' : null,
           ),
           onChanged: (value) {

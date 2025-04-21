@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../models/wall.dart';
 import '../models/pin.dart';
 import '../models/attachment.dart';
+import '../services/firebase_service.dart';
 
 class WallDetailScreen extends StatelessWidget {
-  final Wall wall;
+  final String wallId;
+  final FirebaseService _firebaseService = FirebaseService();
 
   // Beispiel-Pins - später durch echte Daten ersetzen
   final List<Pin> pins = [
@@ -34,79 +35,115 @@ class WallDetailScreen extends StatelessWidget {
 
   WallDetailScreen({
     super.key,
-    required this.wall,
+    required this.wallId,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(wall.title),
-      ),
-      body: GridView.extent(
-        maxCrossAxisExtent: 600,
-        padding: const EdgeInsets.all(8.0),
-        mainAxisSpacing: 8.0,
-        crossAxisSpacing: 8.0,
-        childAspectRatio: 0.8,
-        children: pins
-            .map((pin) => Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (pin.attachments.isNotEmpty &&
-                          pin.attachments.first.type == AttachmentType.image)
-                        AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: Image.network(
-                            pin.attachments.first.url,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                child: Icon(
-                                  Icons.image_not_supported,
-                                  size: 50,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                pin.title,
-                                style: Theme.of(context).textTheme.titleLarge,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+    return FutureBuilder(
+      future: _firebaseService.getWall(wallId),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: Center(
+              child: Text('Fehler beim Laden: ${snapshot.error}'),
+            ),
+          );
+        }
+
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final wall = snapshot.data;
+        if (wall == null) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: Center(
+              child: Text('Wall nicht gefunden'),
+            ),
+          );
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(wall.title),
+          ),
+          body: GridView.extent(
+            maxCrossAxisExtent: 600,
+            padding: const EdgeInsets.all(8.0),
+            mainAxisSpacing: 8.0,
+            crossAxisSpacing: 8.0,
+            childAspectRatio: 0.8,
+            children: pins
+                .map((pin) => Card(
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (pin.attachments.isNotEmpty &&
+                              pin.attachments.first.type ==
+                                  AttachmentType.image)
+                            AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Image.network(
+                                pin.attachments.first.url,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Center(
+                                    child: Icon(
+                                      Icons.image_not_supported,
+                                      size: 50,
+                                    ),
+                                  );
+                                },
                               ),
-                              const SizedBox(height: 8),
-                              Expanded(
-                                child: Text(
-                                  pin.body,
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                  overflow: TextOverflow.fade,
-                                ),
+                            ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    pin.title,
+                                    style:
+                                        Theme.of(context).textTheme.titleLarge,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Expanded(
+                                    child: Text(
+                                      pin.body,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
+                                      overflow: TextOverflow.fade,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                ))
-            .toList(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Neuen Pin hinzufügen
-        },
-        child: const Icon(Icons.add),
-      ),
+                    ))
+                .toList(),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              // TODO: Neuen Pin hinzufügen
+            },
+            child: const Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
 }
