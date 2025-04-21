@@ -28,4 +28,18 @@ class FirebaseService {
     return _firestore.collection('walls').snapshots().map((snapshot) =>
         snapshot.docs.map((doc) => Wall.fromJson(doc.data())).toList());
   }
+
+  Future<void> updateWall(
+      String id, String title, String assetImageName) async {
+    final wallRef = _firestore.collection('walls').doc(id);
+
+    await wallRef.update({
+      'title': title,
+      'assetImageName': assetImageName,
+    });
+  }
+
+  Future<void> deleteWall(String id) async {
+    await _firestore.collection('walls').doc(id).delete();
+  }
 }

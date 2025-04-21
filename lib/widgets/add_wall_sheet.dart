@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'wall_form.dart';
 import '../services/firebase_service.dart';
 import '../services/storage_service.dart';
+import 'sheet_bar.dart';
 
 class AddWallSheet extends StatefulWidget {
   const AddWallSheet({super.key});
@@ -159,45 +160,27 @@ class _AddWallSheetState extends State<AddWallSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: 150,
-                alignment: Alignment.centerLeft,
-                child: TextButton(
-                  onPressed: _goBack,
-                  style: TextButton.styleFrom(
-                    minimumSize: Size.zero,
-                    padding: const EdgeInsets.all(8),
-                  ),
-                  child: Text(isSecondPage ? 'Zurück' : 'Abbrechen'),
-                ),
+          SheetBar(
+            title: 'Pinnwand hinzufügen',
+            leftAction: TextButton(
+              onPressed: _goBack,
+              style: TextButton.styleFrom(
+                minimumSize: Size.zero,
+                padding: const EdgeInsets.all(8),
               ),
-              Expanded(
-                child: Text(
-                  'Pinnwand hinzufügen',
-                  style: Theme.of(context).textTheme.titleLarge,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Container(
-                width: 150,
-                alignment: Alignment.centerRight,
-                child: isSecondPage
-                    ? TextButton(
-                        onPressed: isCreatingNew
-                            ? _createNewBoard
-                            : _openExistingBoard,
-                        style: TextButton.styleFrom(
-                          minimumSize: Size.zero,
-                          padding: const EdgeInsets.all(8),
-                        ),
-                        child: const Text('Erstellen'),
-                      )
-                    : const SizedBox(),
-              ),
-            ],
+              child: Text(isSecondPage ? 'Zurück' : 'Abbrechen'),
+            ),
+            rightAction: isSecondPage
+                ? TextButton(
+                    onPressed:
+                        isCreatingNew ? _createNewBoard : _openExistingBoard,
+                    style: TextButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: const EdgeInsets.all(8),
+                    ),
+                    child: const Text('Erstellen'),
+                  )
+                : null,
           ),
           const SizedBox(height: 16),
           Flexible(
