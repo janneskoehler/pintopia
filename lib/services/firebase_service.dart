@@ -71,6 +71,7 @@ class FirebaseService {
         .doc(wallId)
         .collection('pins')
         .add({
+      'wallId': wallId,
       'title': title,
       'body': body,
       'color': {
@@ -85,5 +86,19 @@ class FirebaseService {
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  Future<void> updatePin(Pin pin) async {
+    try {
+      final docRef = FirebaseFirestore.instance
+          .collection('walls')
+          .doc(pin.wallId)
+          .collection('pins')
+          .doc(pin.id);
+
+      await docRef.update(pin.toJson());
+    } catch (e) {
+      throw Exception('Failed to update pin: $e');
+    }
   }
 }

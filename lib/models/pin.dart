@@ -8,6 +8,7 @@ part 'pin.g.dart';
 @JsonSerializable()
 class Pin {
   final String id;
+  final String wallId;
   final String title;
   final String body;
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
@@ -22,19 +23,17 @@ class Pin {
 
   Pin({
     required this.id,
+    required this.wallId,
     required this.title,
     required this.body,
-    Color? color,
     this.url,
-    bool? urlOnly,
-    List<Attachment>? attachments,
+    this.urlOnly = false,
+    required this.color,
+    this.attachments = const [],
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : this.color = color ?? Colors.white,
-        this.urlOnly = urlOnly ?? false,
-        this.attachments = attachments ?? [],
-        this.createdAt = createdAt ?? DateTime.now(),
-        this.updatedAt = updatedAt ?? DateTime.now();
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 
   // Factory-Konstruktor und toJson-Methode werden automatisch generiert
   factory Pin.fromJson(Map<String, dynamic> json) => _$PinFromJson(json);
@@ -58,24 +57,29 @@ class Pin {
         'b': color.b,
       };
 
-  static DateTime _dateTimeFromTimestamp(Timestamp timestamp) =>
-      timestamp.toDate();
-  static Timestamp _timestampFromDateTime(DateTime dateTime) =>
-      Timestamp.fromDate(dateTime);
+  static DateTime _dateTimeFromTimestamp(Timestamp timestamp) {
+    return timestamp.toDate();
+  }
+
+  static Timestamp _timestampFromDateTime(DateTime dateTime) {
+    return Timestamp.fromDate(dateTime);
+  }
 
   Pin copyWith({
     String? id,
+    String? wallId,
     String? title,
     String? body,
-    Color? color,
     String? url,
     bool? urlOnly,
+    Color? color,
     List<Attachment>? attachments,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
     return Pin(
       id: id ?? this.id,
+      wallId: wallId ?? this.wallId,
       title: title ?? this.title,
       body: body ?? this.body,
       color: color ?? this.color,
