@@ -34,7 +34,7 @@ class ShareWallSheet extends StatelessWidget {
       if (byteData == null) return;
 
       // Speichern in der Galerie
-      final result = await ImageGallerySaver.saveImage(
+      await ImageGallerySaver.saveImage(
         byteData.buffer.asUint8List(),
         name: 'qr_code_${wall.id}',
         quality: 100,

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/pin.dart';
-import '../models/attachment.dart';
 import '../services/firebase_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/share_wall_sheet.dart';
 import '../widgets/create_pin_sheet.dart';
+import '../widgets/pin_card.dart';
 
 class WallDetailScreen extends StatelessWidget {
   final String wallId;
@@ -90,93 +90,48 @@ class WallDetailScreen extends StatelessWidget {
           body: StreamBuilder<List<Pin>>(
             stream: _firebaseService.getPinsStream(wallId),
             builder: (context, pinsSnapshot) {
-              if (pinsSnapshot.hasError) {
-                return Center(
-                  child:
-                      Text('Fehler beim Laden der Pins: ${pinsSnapshot.error}'),
-                );
-              }
+              return FutureBuilder<bool>(
+                future: _storageService.isAdminWall(wallId),
+                builder: (context, isAdminSnapshot) {
+                  if (pinsSnapshot.hasError) {
+                    return Center(
+                      child: Text(
+                          'Fehler beim Laden der Pins: ${pinsSnapshot.error}'),
+                    );
+                  }
 
-              if (!pinsSnapshot.hasData) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
+                  if (!pinsSnapshot.hasData) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
 
-              final pins = pinsSnapshot.data!;
+                  final pins = pinsSnapshot.data!;
+                  final isAdmin = isAdminSnapshot.data ?? false;
 
-              if (pins.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'Keine Pins vorhanden',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                );
-              }
+                  if (pins.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'Keine Pins vorhanden',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    );
+                  }
 
-              return GridView.extent(
-                maxCrossAxisExtent: 600,
-                padding: const EdgeInsets.all(8.0),
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                childAspectRatio: 0.8,
-                children: pins
-                    .map((pin) => Card(
-                          clipBehavior: Clip.antiAlias,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (pin.attachments.isNotEmpty &&
-                                  pin.attachments.first.type ==
-                                      AttachmentType.image)
-                                AspectRatio(
-                                  aspectRatio: 16 / 9,
-                                  child: Image.network(
-                                    pin.attachments.first.url,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Center(
-                                        child: Icon(
-                                          Icons.image_not_supported,
-                                          size: 50,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        pin.title,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Expanded(
-                                        child: Text(
-                                          pin.body,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium,
-                                          overflow: TextOverflow.fade,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ))
-                    .toList(),
+                  return GridView.extent(
+                    maxCrossAxisExtent: 300,
+                    padding: const EdgeInsets.all(8.0),
+                    mainAxisSpacing: 16.0,
+                    crossAxisSpacing: 16.0,
+                    childAspectRatio: 1.0,
+                    children: pins
+                        .map((pin) => PinCard(
+                              pin: pin,
+                              isAdmin: isAdmin,
+                            ))
+                        .toList(),
+                  );
+                },
               );
             },
           ),
