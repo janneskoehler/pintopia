@@ -12,7 +12,8 @@ Pin _$PinFromJson(Map<String, dynamic> json) => Pin(
       title: json['title'] as String,
       body: json['body'] as String,
       url: json['url'] as String?,
-      urlOnly: json['urlOnly'] as bool? ?? false,
+      urlLabel: json['urlLabel'] as String?,
+      directLink: json['directLink'] as bool? ?? false,
       color: Pin._colorFromJson(json['color'] as Map<String, dynamic>),
       attachments: (json['attachments'] as List<dynamic>?)
               ?.map((e) => Attachment.fromJson(e as Map<String, dynamic>))
@@ -29,7 +30,8 @@ Map<String, dynamic> _$PinToJson(Pin instance) => <String, dynamic>{
       'body': instance.body,
       'color': Pin._colorToJson(instance.color),
       'url': instance.url,
-      'urlOnly': instance.urlOnly,
+      'urlLabel': instance.urlLabel,
+      'directLink': instance.directLink,
       'attachments': instance.attachments,
       'createdAt': Pin._timestampFromDateTime(instance.createdAt),
       'updatedAt': Pin._timestampFromDateTime(instance.updatedAt),

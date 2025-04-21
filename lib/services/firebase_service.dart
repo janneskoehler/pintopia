@@ -101,4 +101,14 @@ class FirebaseService {
       throw Exception('Failed to update pin: $e');
     }
   }
+
+  Stream<Pin> getPinStream(String wallId, String pinId) {
+    return FirebaseFirestore.instance
+        .collection('walls')
+        .doc(wallId)
+        .collection('pins')
+        .doc(pinId)
+        .snapshots()
+        .map((doc) => Pin.fromJson(doc.data()!));
+  }
 }

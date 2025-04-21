@@ -14,7 +14,8 @@ class Pin {
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
   final Color color;
   final String? url;
-  final bool urlOnly;
+  final String? urlLabel;
+  final bool directLink;
   final List<Attachment> attachments;
   @JsonKey(fromJson: _dateTimeFromTimestamp, toJson: _timestampFromDateTime)
   final DateTime createdAt;
@@ -27,7 +28,8 @@ class Pin {
     required this.title,
     required this.body,
     this.url,
-    this.urlOnly = false,
+    this.urlLabel,
+    this.directLink = false,
     required this.color,
     this.attachments = const [],
     DateTime? createdAt,
@@ -71,7 +73,8 @@ class Pin {
     String? title,
     String? body,
     String? url,
-    bool? urlOnly,
+    String? urlLabel,
+    bool? directLink,
     Color? color,
     List<Attachment>? attachments,
     DateTime? createdAt,
@@ -84,7 +87,8 @@ class Pin {
       body: body ?? this.body,
       color: color ?? this.color,
       url: url ?? this.url,
-      urlOnly: urlOnly ?? this.urlOnly,
+      urlLabel: urlLabel ?? this.urlLabel,
+      directLink: directLink ?? this.directLink,
       attachments: attachments ?? this.attachments,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

@@ -51,5 +51,10 @@
 		<string>Diese App benötigt Zugriff auf die Fotos, um Fotos für Boards aufzunehmen und QR-Codes zu speichern.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Diese App benötigt Zugriff auf die Fotos, um Bilder für Boards auszuwählen und QR-Codes zu speichern.</string>
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>http</string>
+			<string>https</string>
+		</array>
 	</dict>
 </plist>

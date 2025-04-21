@@ -32,14 +32,14 @@ class PinCard extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Image.asset(
-                    'assets/images/thumb01.jpg',
+                    'assets/images/thumb00.png',
                     fit: BoxFit.cover,
                   );
                 },
               )
             else
               Image.asset(
-                'assets/images/thumb01.jpg',
+                'assets/images/thumb00.png',
                 fit: BoxFit.cover,
               ),
             Container(
@@ -50,14 +50,29 @@ class PinCard extends StatelessWidget {
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  pin.title,
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (pin.directLink) ...[
+                      const Icon(
+                        Icons.link,
                         color: Colors.white,
                       ),
-                  textAlign: TextAlign.center,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
+                      const SizedBox(width: 8),
+                    ],
+                    Flexible(
+                      child: Text(
+                        pin.title,
+                        style:
+                            Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                  color: Colors.white,
+                                ),
+                        textAlign: TextAlign.center,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -68,7 +83,7 @@ class PinCard extends StatelessWidget {
   }
 
   Future<void> _handleTap(BuildContext context) async {
-    if (pin.urlOnly && pin.url != null) {
+    if (pin.directLink && pin.url != null) {
       final url = Uri.parse(pin.url!);
       if (await canLaunchUrl(url)) {
         await launchUrl(url);
