@@ -10,22 +10,24 @@ Pin _$PinFromJson(Map<String, dynamic> json) => Pin(
       id: json['id'] as String,
       title: json['title'] as String,
       body: json['body'] as String,
+      color: Pin._colorFromJson(json['color'] as Map<String, dynamic>),
+      url: json['url'] as String?,
+      urlOnly: json['urlOnly'] as bool?,
       attachments: (json['attachments'] as List<dynamic>?)
           ?.map((e) => Attachment.fromJson(e as Map<String, dynamic>))
           .toList(),
-      createdAt: json['createdAt'] == null
-          ? null
-          : DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
-          ? null
-          : DateTime.parse(json['updatedAt'] as String),
+      createdAt: Pin._dateTimeFromTimestamp(json['createdAt'] as Timestamp),
+      updatedAt: Pin._dateTimeFromTimestamp(json['updatedAt'] as Timestamp),
     );
 
 Map<String, dynamic> _$PinToJson(Pin instance) => <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'body': instance.body,
+      'color': Pin._colorToJson(instance.color),
+      'url': instance.url,
+      'urlOnly': instance.urlOnly,
       'attachments': instance.attachments,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt.toIso8601String(),
+      'createdAt': Pin._timestampFromDateTime(instance.createdAt),
+      'updatedAt': Pin._timestampFromDateTime(instance.updatedAt),
     };

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import '../models/wall.dart';
+import '../models/pin.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -42,5 +44,46 @@ class FirebaseService {
 
   Future<void> deleteWall(String id) async {
     await _firestore.collection('walls').doc(id).delete();
+  }
+
+  Stream<List<Pin>> getPinsStream(String wallId) {
+    return FirebaseFirestore.instance
+        .collection('walls')
+        .doc(wallId)
+        .collection('pins')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Pin.fromJson({...doc.data(), 'id': doc.id}))
+            .toList());
+  }
+
+  Future<void> createPin({
+    required String wallId,
+    required String title,
+    required String body,
+    Color? color,
+    String? url,
+    bool urlOnly = false,
+  }) async {
+    final pinColor = color ?? Colors.white;
+    await FirebaseFirestore.instance
+        .collection('walls')
+        .doc(wallId)
+        .collection('pins')
+        .add({
+      'title': title,
+      'body': body,
+      'color': {
+        'a': pinColor.a,
+        'r': pinColor.r,
+        'g': pinColor.g,
+        'b': pinColor.b,
+      },
+      'url': url,
+      'urlOnly': urlOnly,
+      'attachments': [],
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
   }
 }
