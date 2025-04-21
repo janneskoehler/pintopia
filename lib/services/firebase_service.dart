@@ -12,6 +12,7 @@ class FirebaseService {
       title: title,
       imageUrl: '', // Leer, da wir Asset-Bilder verwenden
       assetImageName: assetImageName,
+      adminCode: Wall.generateAdminCode(),
     );
 
     await docRef.set(wall.toJson());

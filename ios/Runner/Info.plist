@@ -47,7 +47,9 @@
 		<true/>
 		<key>NSCameraUsageDescription</key>
 		<string>Diese App benötigt Zugriff auf die Kamera, um Fotos für Boards aufzunehmen.</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Diese App benötigt Zugriff auf die Fotos, um Fotos für Boards aufzunehmen und QR-Codes zu speichern.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>Diese App benötigt Zugriff auf die Fotobibliothek, um Bilder für Boards auszuwählen.</string>
+		<string>Diese App benötigt Zugriff auf die Fotos, um Bilder für Boards auszuwählen und QR-Codes zu speichern.</string>
 	</dict>
 </plist>

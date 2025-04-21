@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/pin.dart';
 import '../models/attachment.dart';
-import '../models/wall.dart';
 import '../services/firebase_service.dart';
 import '../services/storage_service.dart';
-import '../widgets/edit_wall_sheet.dart';
+import '../widgets/share_wall_sheet.dart';
 
 class WallDetailScreen extends StatelessWidget {
   final String wallId;
@@ -77,6 +76,26 @@ class WallDetailScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(wall.title),
+            actions: [
+              FutureBuilder<bool>(
+                future: _storageService.isAdminWall(wallId),
+                builder: (context, isAdminSnapshot) {
+                  if (isAdminSnapshot.hasData && isAdminSnapshot.data == true) {
+                    return IconButton(
+                      icon: const Icon(Icons.share),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) => ShareWallSheet(wall: wall),
+                        );
+                      },
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ],
           ),
           body: GridView.extent(
             maxCrossAxisExtent: 600,

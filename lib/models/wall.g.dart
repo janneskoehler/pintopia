@@ -11,6 +11,7 @@ Wall _$WallFromJson(Map<String, dynamic> json) => Wall(
       title: json['title'] as String,
       imageUrl: json['imageUrl'] as String?,
       assetImageName: json['assetImageName'] as String?,
+      adminCode: json['adminCode'] as String,
     );
 
 Map<String, dynamic> _$WallToJson(Wall instance) => <String, dynamic>{
@@ -18,4 +19,5 @@ Map<String, dynamic> _$WallToJson(Wall instance) => <String, dynamic>{
       'title': instance.title,
       'imageUrl': instance.imageUrl,
       'assetImageName': instance.assetImageName,
+      'adminCode': instance.adminCode,
     };
