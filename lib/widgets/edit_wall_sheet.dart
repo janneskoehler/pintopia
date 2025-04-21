@@ -4,7 +4,7 @@ import '../services/firebase_service.dart';
 import 'wall_form.dart';
 import 'sheet_bar.dart';
 
-class EditWallSheet extends StatelessWidget {
+class EditWallSheet extends StatefulWidget {
   final Wall wall;
   final String wallId;
   final FirebaseService firebaseService;
@@ -17,10 +17,28 @@ class EditWallSheet extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final nameController = TextEditingController(text: wall.title);
-    String? selectedImage = wall.assetImageName;
+  State<EditWallSheet> createState() => _EditWallSheetState();
+}
 
+class _EditWallSheetState extends State<EditWallSheet> {
+  late final TextEditingController _nameController;
+  String? _selectedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.wall.title);
+    _selectedImage = widget.wall.assetImageName;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -43,10 +61,10 @@ class EditWallSheet extends StatelessWidget {
             ),
             rightAction: TextButton(
               onPressed: () async {
-                await firebaseService.updateWall(
-                  wallId,
-                  nameController.text,
-                  selectedImage ?? '',
+                await widget.firebaseService.updateWall(
+                  widget.wallId,
+                  _nameController.text,
+                  _selectedImage ?? '',
                 );
                 if (context.mounted) Navigator.pop(context);
               },
@@ -59,9 +77,11 @@ class EditWallSheet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           WallForm(
-            nameController: nameController,
-            selectedAssetImage: selectedImage,
-            onAssetImageSelected: (image) => selectedImage = image,
+            nameController: _nameController,
+            selectedAssetImage: _selectedImage,
+            onAssetImageSelected: (image) => setState(() {
+              _selectedImage = image;
+            }),
           ),
           const SizedBox(height: 16),
           TextButton.icon(
@@ -97,7 +117,7 @@ class EditWallSheet extends StatelessWidget {
               foregroundColor: Theme.of(context).colorScheme.error,
             ),
             onPressed: () async {
-              await firebaseService.deleteWall(wallId);
+              await widget.firebaseService.deleteWall(widget.wallId);
               if (context.mounted) {
                 Navigator.pop(context); // Dialog schließen
                 Navigator.pop(context); // Settings-Sheet schließen

@@ -77,20 +77,6 @@ class WallDetailScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(wall.title),
-            actions: [
-              FutureBuilder<bool>(
-                future: _storageService.isAdminWall(wallId),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data == true) {
-                    return IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () => _showSettingsSheet(context, wall),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-            ],
           ),
           body: GridView.extent(
             maxCrossAxisExtent: 600,
@@ -162,18 +148,6 @@ class WallDetailScreen extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  void _showSettingsSheet(BuildContext context, Wall wall) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => EditWallSheet(
-        wall: wall,
-        wallId: wallId,
-        firebaseService: _firebaseService,
-      ),
     );
   }
 }

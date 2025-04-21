@@ -4,12 +4,19 @@ import '../widgets/add_wall_sheet.dart';
 import '../services/firebase_service.dart';
 import '../services/storage_service.dart';
 import 'package:go_router/go_router.dart';
+import '../widgets/edit_wall_sheet.dart';
 
-class WallListScreen extends StatelessWidget {
+class WallListScreen extends StatefulWidget {
+  WallListScreen({super.key});
+
+  @override
+  State<WallListScreen> createState() => _WallListScreenState();
+}
+
+class _WallListScreenState extends State<WallListScreen> {
   final FirebaseService _firebaseService = FirebaseService();
   final StorageService _storageService = StorageService();
-
-  WallListScreen({super.key});
+  bool _isEditMode = false;
 
   Future<List<Wall>> _loadWalls() async {
     final wallIds = await _storageService.getWalls();
@@ -29,11 +36,36 @@ class WallListScreen extends StatelessWidget {
     AddWallSheet.show(context);
   }
 
+  void _toggleEditMode() {
+    setState(() {
+      _isEditMode = !_isEditMode;
+    });
+  }
+
+  void _showEditWallSheet(BuildContext context, Wall wall) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => EditWallSheet(
+        wall: wall,
+        wallId: wall.id,
+        firebaseService: _firebaseService,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Meine Walls'),
+        actions: [
+          if (_isEditMode)
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: _toggleEditMode,
+            ),
+        ],
       ),
       body: FutureBuilder<List<Wall>>(
         future: _loadWalls(),
@@ -60,51 +92,86 @@ class WallListScreen extends StatelessWidget {
                       clipBehavior: Clip.antiAlias,
                       child: InkWell(
                         onTap: () {
-                          context.goNamed(
-                            'wall-detail',
-                            pathParameters: {'id': wall.id},
-                          );
+                          if (!_isEditMode) {
+                            context.goNamed(
+                              'wall-detail',
+                              pathParameters: {'id': wall.id},
+                            );
+                          }
                         },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                        onLongPress: _toggleEditMode,
+                        child: Stack(
                           children: [
-                            AspectRatio(
-                              aspectRatio: 16 / 9,
-                              child: wall.assetImageName != null
-                                  ? Image.asset(
-                                      'assets/images/${wall.assetImageName}',
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Image.network(
-                                      wall.imageUrl ?? '',
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return const Center(
-                                          child: Icon(
-                                            Icons.image_not_supported,
-                                            size: 50,
-                                          ),
-                                        );
-                                      },
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                AspectRatio(
+                                  aspectRatio: 16 / 9,
+                                  child: wall.assetImageName != null
+                                      ? Image.asset(
+                                          'assets/images/${wall.assetImageName}',
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.network(
+                                          wall.imageUrl ?? '',
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return const Center(
+                                              child: Icon(
+                                                Icons.image_not_supported,
+                                                size: 50,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Center(
+                                      child: Text(
+                                        wall.title,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineSmall,
+                                        textAlign: TextAlign.center,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Center(
-                                  child: Text(
-                                    wall.title,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall,
-                                    textAlign: TextAlign.center,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
+                            if (_isEditMode)
+                              FutureBuilder<bool>(
+                                future: _storageService.isAdminWall(wall.id),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData ||
+                                      snapshot.data != true) {
+                                    return const SizedBox();
+                                  }
+
+                                  return Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: Material(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(20),
+                                        onTap: () =>
+                                            _showEditWallSheet(context, wall),
+                                        child: const Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Icon(Icons.edit),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                           ],
                         ),
                       ),
