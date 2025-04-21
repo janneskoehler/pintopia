@@ -18,6 +18,20 @@ class PinCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => _handleTap(context),
+      onLongPress: isAdmin
+          ? () {
+              showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                  child: PinDetailView(
+                    pin: pin,
+                    isAdmin: true,
+                    initialEditMode: true,
+                  ),
+                ),
+              );
+            }
+          : null,
       child: Card(
         clipBehavior: Clip.antiAlias,
         elevation: 8.0,

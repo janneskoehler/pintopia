@@ -8,11 +8,13 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 class PinDetailView extends StatefulWidget {
   final Pin pin;
   final bool isAdmin;
+  final bool initialEditMode;
 
   const PinDetailView({
     super.key,
     required this.pin,
     this.isAdmin = false,
+    this.initialEditMode = false,
   });
 
   @override
@@ -20,7 +22,7 @@ class PinDetailView extends StatefulWidget {
 }
 
 class _PinDetailViewState extends State<PinDetailView> {
-  bool _isEditMode = false;
+  late bool _isEditMode;
   bool _isSaving = false;
   late TextEditingController _titleController;
   late TextEditingController _bodyController;
@@ -34,6 +36,7 @@ class _PinDetailViewState extends State<PinDetailView> {
   @override
   void initState() {
     super.initState();
+    _isEditMode = widget.initialEditMode;
     _initializeControllers(widget.pin);
     _pinStream =
         _firebaseService.getPinStream(widget.pin.wallId, widget.pin.id);
