@@ -8,18 +8,21 @@ class PinCard extends StatelessWidget {
   final Pin pin;
   final bool isAdmin;
   final bool isEditMode;
+  final VoidCallback? onLongPress;
 
   const PinCard({
     super.key,
     required this.pin,
     this.isAdmin = false,
     this.isEditMode = false,
+    this.onLongPress,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => _handleTap(context),
+      onTap: !isEditMode ? () => _handleTap(context) : null,
+      onLongPress: isAdmin ? onLongPress : null,
       child: Card(
         clipBehavior: Clip.antiAlias,
         elevation: 8.0,

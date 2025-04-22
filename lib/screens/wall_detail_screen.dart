@@ -67,55 +67,32 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
                   if (isAdminSnapshot.hasData && isAdminSnapshot.data == true) {
                     return Row(
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () {
-                            final newPinRef = FirebaseFirestore.instance
-                                .collection('pins')
-                                .doc();
-
-                            final now = DateTime.now();
-
-                            final newPin = Pin(
-                              id: newPinRef.id,
-                              wallId: widget.wallId,
-                              title: '',
-                              body: '',
-                              color: Pin.getRandomColor(),
-                              createdAt: now,
-                              updatedAt: now,
-                            );
-
-                            showDialog(
-                              context: context,
-                              builder: (context) => Dialog(
-                                child: PinDetailView(
-                                  pin: newPin,
-                                  isAdmin: true,
-                                  initialEditMode: true,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.share),
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (context) => ShareWallSheet(wall: wall),
-                            );
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(_isEditMode ? Icons.done : Icons.edit),
-                          onPressed: () {
-                            setState(() {
-                              _isEditMode = !_isEditMode;
-                            });
-                          },
-                        ),
+                        if (!_isEditMode) ...[
+                          IconButton(
+                            icon: const Icon(Icons.add),
+                            onPressed: _createNewPin,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.share),
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                builder: (context) =>
+                                    ShareWallSheet(wall: wall),
+                              );
+                            },
+                          ),
+                        ],
+                        if (_isEditMode)
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              setState(() {
+                                _isEditMode = false;
+                              });
+                            },
+                          ),
                       ],
                     );
                   }
@@ -161,7 +138,17 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
                     onReorder: _isEditMode
                         ? (ReorderedListFunction reorderedListFunction) {
                             setState(() {
-                              // TODO: Implement reordering logic
+                              final reorderedList = reorderedListFunction(pins);
+                              final updates = <Future<void>>[];
+                              for (var i = 0; i < reorderedList.length; i++) {
+                                final pin = reorderedList[i];
+                                if (pin.position != i) {
+                                  updates.add(widget._firebaseService.updatePin(
+                                    pin.copyWith(position: i),
+                                  ));
+                                }
+                              }
+                              Future.wait(updates);
                             });
                           }
                         : null,
@@ -180,6 +167,8 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
                               pin: pin,
                               isAdmin: isAdmin,
                               isEditMode: _isEditMode,
+                              onLongPress: () =>
+                                  setState(() => _isEditMode = true),
                             ))
                         .toList(),
                   );
@@ -189,6 +178,32 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
           ),
         );
       },
+    );
+  }
+
+  void _createNewPin() {
+    final newPinRef = FirebaseFirestore.instance.collection('pins').doc();
+    final now = DateTime.now();
+
+    final newPin = Pin(
+      id: newPinRef.id,
+      wallId: widget.wallId,
+      title: '',
+      body: '',
+      color: Pin.getRandomColor(),
+      createdAt: now,
+      updatedAt: now,
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: PinDetailView(
+          pin: newPin,
+          isAdmin: true,
+          initialEditMode: true,
+        ),
+      ),
     );
   }
 }
