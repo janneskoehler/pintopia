@@ -51,32 +51,6 @@ class _PinDetailViewState extends State<PinDetailView> {
     _selectedDirectLink = pin.directLink;
   }
 
-  void _showColorPicker() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Farbe wählen'),
-        content: SingleChildScrollView(
-          child: BlockPicker(
-            pickerColor: _selectedColor,
-            onColorChanged: (color) {
-              setState(() {
-                _selectedColor = color;
-              });
-              Navigator.of(context).pop();
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Abbrechen'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   void dispose() {
     _titleController.dispose();
@@ -211,40 +185,24 @@ class _PinDetailViewState extends State<PinDetailView> {
                                 children: [
                                   IconButton(
                                     onPressed: _showColorPicker,
-                                    icon: Icon(
-                                      Icons.color_lens,
-                                      color: _selectedColor,
-                                    ),
+                                    icon: const Icon(Icons.color_lens),
                                     style: IconButton.styleFrom(
                                       backgroundColor: Colors.white,
-                                      foregroundColor: Colors.black87,
+                                      foregroundColor: _selectedColor,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  IconButton(
-                                    onPressed: () {
-                                      if (widget.initialEditMode) {
-                                        Navigator.of(context).pop();
-                                      } else {
-                                        setState(() {
-                                          _titleController.text = pin.title;
-                                          _bodyController.text = pin.body;
-                                          _urlController.text = pin.url ?? '';
-                                          _urlLabelController.text =
-                                              pin.urlLabel ?? '';
-                                          _selectedColor = pin.color;
-                                          _selectedDirectLink = pin.directLink;
-                                          _isEditMode = false;
-                                        });
-                                      }
-                                    },
-                                    icon: const Icon(Icons.close),
-                                    style: IconButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: Colors.black87,
+                                  if (!widget.pin.isNew) ...[
+                                    IconButton(
+                                      onPressed: _handleDelete,
+                                      icon: const Icon(Icons.delete),
+                                      style: IconButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.red,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
+                                    const SizedBox(width: 8),
+                                  ],
                                   IconButton(
                                     onPressed: _isSaving ? null : _saveChanges,
                                     icon: _isSaving
@@ -254,6 +212,15 @@ class _PinDetailViewState extends State<PinDetailView> {
                                             child: CircularProgressIndicator(),
                                           )
                                         : const Icon(Icons.check),
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    onPressed: () => _handleClose(pin),
+                                    icon: const Icon(Icons.close),
                                     style: IconButton.styleFrom(
                                       backgroundColor: Colors.white,
                                       foregroundColor: Colors.black87,
@@ -338,6 +305,7 @@ class _PinDetailViewState extends State<PinDetailView> {
                                 textAlignVertical: TextAlignVertical.top,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(),
+                                  hintText: 'Inhalt',
                                 ),
                               )
                             : Text(
@@ -404,6 +372,94 @@ class _PinDetailViewState extends State<PinDetailView> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _handleClose(Pin pin) {
+    if (widget.initialEditMode) {
+      Navigator.of(context).pop();
+    } else {
+      setState(() {
+        _titleController.text = pin.title;
+        _bodyController.text = pin.body;
+        _urlController.text = pin.url ?? '';
+        _urlLabelController.text = pin.urlLabel ?? '';
+        _selectedColor = pin.color;
+        _selectedDirectLink = pin.directLink;
+        _isEditMode = false;
+      });
+    }
+  }
+
+  Future<void> _handleDelete() async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Pin löschen'),
+        content: const Text('Möchten Sie diesen Pin wirklich löschen?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Abbrechen'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text(
+              'Löschen',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete == true && context.mounted) {
+      try {
+        Navigator.of(context).pop(); // Schließe zuerst den Detail-Dialog
+        await _firebaseService.deletePin(widget.pin);
+      } catch (e) {
+        if (context.mounted) {
+          await showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: const Text('Fehler'),
+              content: Text(e.toString()),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  void _showColorPicker() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Farbe wählen'),
+        content: SingleChildScrollView(
+          child: BlockPicker(
+            pickerColor: _selectedColor,
+            onColorChanged: (color) {
+              setState(() {
+                _selectedColor = color;
+              });
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Abbrechen'),
+          ),
+        ],
       ),
     );
   }
