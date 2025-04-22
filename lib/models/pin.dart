@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'attachment.dart';
@@ -94,4 +95,33 @@ class Pin {
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
+
+  static const availableColors = [
+    Colors.red,
+    Colors.pink,
+    Colors.purple,
+    Colors.deepPurple,
+    Colors.indigo,
+    Colors.blue,
+    Colors.lightBlue,
+    Colors.cyan,
+    Colors.teal,
+    Colors.green,
+    Colors.lightGreen,
+    Colors.lime,
+    Colors.yellow,
+    Colors.amber,
+    Colors.orange,
+    Colors.deepOrange,
+    Colors.brown,
+    Colors.grey,
+    Colors.blueGrey,
+  ];
+
+  static Color getRandomColor() {
+    final random = Random();
+    return availableColors[random.nextInt(availableColors.length)];
+  }
+
+  bool get isNew => createdAt == updatedAt;
 }

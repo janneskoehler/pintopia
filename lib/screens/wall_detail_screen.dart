@@ -3,8 +3,9 @@ import '../models/pin.dart';
 import '../services/firebase_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/wall/share_wall_sheet.dart';
-import '../widgets/pin/create_pin_sheet.dart';
 import '../widgets/pin/pin_card.dart';
+import '../widgets/pin/pin_detail_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class WallDetailScreen extends StatelessWidget {
   final String wallId;
@@ -61,11 +62,31 @@ class WallDetailScreen extends StatelessWidget {
                         IconButton(
                           icon: const Icon(Icons.add),
                           onPressed: () {
-                            showModalBottomSheet(
+                            final newPinRef = FirebaseFirestore.instance
+                                .collection('pins')
+                                .doc();
+
+                            final now = DateTime.now();
+
+                            final newPin = Pin(
+                              id: newPinRef.id,
+                              wallId: wallId,
+                              title: '',
+                              body: '',
+                              color: Pin.getRandomColor(),
+                              createdAt: now,
+                              updatedAt: now,
+                            );
+
+                            showDialog(
                               context: context,
-                              isScrollControlled: true,
-                              builder: (context) =>
-                                  CreatePinSheet(wallId: wallId),
+                              builder: (context) => Dialog(
+                                child: PinDetailView(
+                                  pin: newPin,
+                                  isAdmin: true,
+                                  initialEditMode: true,
+                                ),
+                              ),
                             );
                           },
                         ),

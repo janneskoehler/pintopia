@@ -92,8 +92,13 @@ class _PinDetailViewState extends State<PinDetailView> {
     });
 
     try {
+      final title = _titleController.text.trim();
+      if (title.isEmpty) {
+        throw Exception('Bitte geben Sie einen Titel ein');
+      }
+
       final updatedPin = widget.pin.copyWith(
-        title: _titleController.text,
+        title: title,
         body: _bodyController.text,
         color: _selectedColor,
         url: _urlController.text.isEmpty ? null : _urlController.text,
@@ -103,17 +108,31 @@ class _PinDetailViewState extends State<PinDetailView> {
         updatedAt: DateTime.now(),
       );
 
-      await _firebaseService.updatePin(updatedPin);
+      if (widget.pin.isNew) {
+        await _firebaseService.createPin(updatedPin);
+      } else {
+        await _firebaseService.updatePin(updatedPin);
+      }
 
-      setState(() {
-        _isEditMode = false;
-      });
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Fehler beim Speichern der Änderungen'),
-        ),
-      );
+      if (context.mounted) {
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Fehler beim Speichern'),
+            content: Text(e.toString()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
     } finally {
       setState(() {
         _isSaving = false;
@@ -123,6 +142,10 @@ class _PinDetailViewState extends State<PinDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.initialEditMode && widget.pin.isNew) {
+      return _buildPinDetail(widget.pin);
+    }
+
     return StreamBuilder<Pin>(
       stream: _pinStream,
       initialData: widget.pin,
@@ -132,254 +155,256 @@ class _PinDetailViewState extends State<PinDetailView> {
         }
 
         final pin = snapshot.data!;
+        return _buildPinDetail(pin);
+      },
+    );
+  }
 
-        if (!_isEditMode) {
-          _initializeControllers(pin);
-        }
+  Widget _buildPinDetail(Pin pin) {
+    if (!_isEditMode) {
+      _initializeControllers(pin);
+    }
 
-        return ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 800),
-          child: ClipRRect(
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(28.0)),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  AspectRatio(
-                    aspectRatio: 3 / 1,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        if (pin.attachments.isNotEmpty &&
-                            pin.attachments.first.type == AttachmentType.image)
-                          Image.network(
-                            pin.attachments.first.url,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                'assets/images/thumb00.png',
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          )
-                        else
-                          Image.asset(
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 800),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28.0)),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AspectRatio(
+                aspectRatio: 3 / 1,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (pin.attachments.isNotEmpty &&
+                        pin.attachments.first.type == AttachmentType.image)
+                      Image.network(
+                        pin.attachments.first.url,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
                             'assets/images/thumb00.png',
                             fit: BoxFit.cover,
-                          ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: _selectedColor.withOpacity(0.7),
-                          ),
-                        ),
-                        if (widget.isAdmin)
-                          Positioned(
-                            top: 16,
-                            right: 16,
-                            child: _isEditMode
-                                ? Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        onPressed: _showColorPicker,
-                                        icon: Icon(
-                                          Icons.color_lens,
-                                          color: _selectedColor,
-                                        ),
-                                        style: IconButton.styleFrom(
-                                          backgroundColor: Colors.white,
-                                          foregroundColor: Colors.black87,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _titleController.text = pin.title;
-                                            _bodyController.text = pin.body;
-                                            _urlController.text = pin.url ?? '';
-                                            _urlLabelController.text =
-                                                pin.urlLabel ?? '';
-                                            _selectedColor = pin.color;
-                                            _selectedDirectLink =
-                                                pin.directLink;
-                                            _isEditMode = false;
-                                          });
-                                        },
-                                        icon: const Icon(Icons.close),
-                                        style: IconButton.styleFrom(
-                                          backgroundColor: Colors.white,
-                                          foregroundColor: Colors.black87,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      IconButton(
-                                        onPressed:
-                                            _isSaving ? null : _saveChanges,
-                                        icon: _isSaving
-                                            ? const SizedBox(
-                                                width: 24,
-                                                height: 24,
-                                                child:
-                                                    CircularProgressIndicator(),
-                                              )
-                                            : const Icon(Icons.check),
-                                        style: IconButton.styleFrom(
-                                          backgroundColor: Colors.white,
-                                          foregroundColor: Colors.black87,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                : IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _isEditMode = true;
-                                      });
-                                    },
-                                    icon: const Icon(Icons.edit),
+                          );
+                        },
+                      )
+                    else
+                      Image.asset(
+                        'assets/images/thumb00.png',
+                        fit: BoxFit.cover,
+                      ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: _selectedColor.withOpacity(0.7),
+                      ),
+                    ),
+                    if (widget.isAdmin)
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: _isEditMode
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: _showColorPicker,
+                                    icon: Icon(
+                                      Icons.color_lens,
+                                      color: _selectedColor,
+                                    ),
                                     style: IconButton.styleFrom(
                                       backgroundColor: Colors.white,
                                       foregroundColor: Colors.black87,
                                     ),
                                   ),
-                          ),
-                        Center(
-                          child: _isEditMode
-                              ? TextField(
-                                  controller: _titleController,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineLarge
-                                      ?.copyWith(color: Colors.white),
-                                  textAlign: TextAlign.center,
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 8),
-                                  ),
-                                )
-                              : Text(
-                                  pin.title,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineLarge
-                                      ?.copyWith(color: Colors.white),
-                                  textAlign: TextAlign.center,
-                                ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        if (_isEditMode) ...[
-                          SwitchListTile(
-                            title: const Text('Direkt-Link'),
-                            subtitle: const Text(
-                              'Beim Klick auf den Pin wird der Link direkt geöffnet, '
-                              'ohne den Pin-Inhalt anzuzeigen.',
-                            ),
-                            value: _selectedDirectLink,
-                            onChanged: (bool value) {
-                              setState(() {
-                                _selectedDirectLink = value;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                        if (!_isEditMode || !_selectedDirectLink) ...[
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(minHeight: 120),
-                            child: _isEditMode
-                                ? TextField(
-                                    controller: _bodyController,
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
-                                    minLines: 4,
-                                    maxLines: null,
-                                    textAlignVertical: TextAlignVertical.top,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    onPressed: () {
+                                      if (widget.initialEditMode) {
+                                        Navigator.of(context).pop();
+                                      } else {
+                                        setState(() {
+                                          _titleController.text = pin.title;
+                                          _bodyController.text = pin.body;
+                                          _urlController.text = pin.url ?? '';
+                                          _urlLabelController.text =
+                                              pin.urlLabel ?? '';
+                                          _selectedColor = pin.color;
+                                          _selectedDirectLink = pin.directLink;
+                                          _isEditMode = false;
+                                        });
+                                      }
+                                    },
+                                    icon: const Icon(Icons.close),
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black87,
                                     ),
-                                  )
-                                : Text(
-                                    pin.body,
-                                    style:
-                                        Theme.of(context).textTheme.bodyLarge,
                                   ),
-                          ),
-                        ],
-                        if (_isEditMode ||
-                            pin.url != null ||
-                            pin.directLink) ...[
-                          const SizedBox(height: 16.0),
-                          if (_isEditMode) ...[
-                            TextField(
-                              controller: _urlController,
-                              decoration: const InputDecoration(
-                                labelText: 'Link (optional)',
-                                border: OutlineInputBorder(),
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    onPressed: _isSaving ? null : _saveChanges,
+                                    icon: _isSaving
+                                        ? const SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: CircularProgressIndicator(),
+                                          )
+                                        : const Icon(Icons.check),
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black87,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isEditMode = true;
+                                  });
+                                },
+                                icon: const Icon(Icons.edit),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black87,
+                                ),
                               ),
+                      ),
+                    Center(
+                      child: _isEditMode
+                          ? TextField(
+                              controller: _titleController,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineLarge
+                                  ?.copyWith(color: Colors.white),
+                              textAlign: TextAlign.center,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                hintText: 'Titel',
+                                hintStyle: TextStyle(
+                                  color: Colors.white54,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              pin.title,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineLarge
+                                  ?.copyWith(color: Colors.white),
+                              textAlign: TextAlign.center,
                             ),
-                            if (!_selectedDirectLink) ...[
-                              const SizedBox(height: 16.0),
-                              TextField(
-                                controller: _urlLabelController,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (_isEditMode) ...[
+                      SwitchListTile(
+                        title: const Text('Direkt-Link'),
+                        subtitle: const Text(
+                          'Beim Klick auf den Pin wird der Link direkt geöffnet, '
+                          'ohne den Pin-Inhalt anzuzeigen.',
+                        ),
+                        value: _selectedDirectLink,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _selectedDirectLink = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    if (!_isEditMode || !_selectedDirectLink) ...[
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: 120),
+                        child: _isEditMode
+                            ? TextField(
+                                controller: _bodyController,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                                minLines: 4,
+                                maxLines: null,
+                                textAlignVertical: TextAlignVertical.top,
                                 decoration: const InputDecoration(
-                                  labelText: 'Link Beschriftung (optional)',
                                   border: OutlineInputBorder(),
                                 ),
+                              )
+                            : Text(
+                                pin.body,
+                                style: Theme.of(context).textTheme.bodyLarge,
                               ),
-                            ],
-                          ] else
-                            ElevatedButton.icon(
-                              onPressed: () async {
-                                try {
-                                  final url = Uri.parse(pin.url!);
-                                  if (await canLaunchUrl(url)) {
-                                    await launchUrl(url);
-                                  } else {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Der Link konnte nicht geöffnet werden'),
-                                        ),
-                                      );
-                                    }
-                                  }
-                                } catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Ungültiger Link'),
-                                      ),
-                                    );
-                                  }
-                                }
-                              },
-                              icon: const Icon(Icons.link),
-                              label: Text(pin.urlLabel ?? 'Link öffnen'),
+                      ),
+                    ],
+                    if (_isEditMode || pin.url != null || pin.directLink) ...[
+                      const SizedBox(height: 16.0),
+                      if (_isEditMode) ...[
+                        TextField(
+                          controller: _urlController,
+                          decoration: const InputDecoration(
+                            labelText: 'Link (optional)',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        if (!_selectedDirectLink) ...[
+                          const SizedBox(height: 16.0),
+                          TextField(
+                            controller: _urlLabelController,
+                            decoration: const InputDecoration(
+                              labelText: 'Link Beschriftung (optional)',
+                              border: OutlineInputBorder(),
                             ),
+                          ),
                         ],
-                        const SizedBox(height: 32.0),
-                      ],
-                    ),
-                  ),
-                ],
+                      ] else
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            try {
+                              final url = Uri.parse(pin.url!);
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url);
+                              } else {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Der Link konnte nicht geöffnet werden'),
+                                    ),
+                                  );
+                                }
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Ungültiger Link'),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          icon: const Icon(Icons.link),
+                          label: Text(pin.urlLabel ?? 'Link öffnen'),
+                        ),
+                    ],
+                    const SizedBox(height: 32.0),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
