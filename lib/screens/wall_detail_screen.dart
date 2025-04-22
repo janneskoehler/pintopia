@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/pin.dart';
 import '../services/firebase_service.dart';
 import '../services/storage_service.dart';
-import '../widgets/share_wall_sheet.dart';
-import '../widgets/create_pin_sheet.dart';
-import '../widgets/pin_card.dart';
+import '../widgets/wall/share_wall_sheet.dart';
+import '../widgets/pin/create_pin_sheet.dart';
+import '../widgets/pin/pin_card.dart';
 
 class WallDetailScreen extends StatelessWidget {
   final String wallId;

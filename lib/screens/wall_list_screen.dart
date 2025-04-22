@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/wall.dart';
-import '../widgets/add_wall_sheet.dart';
+import '../widgets/wall/add_wall_sheet.dart';
 import '../services/firebase_service.dart';
 import '../services/storage_service.dart';
 import 'package:go_router/go_router.dart';
-import '../widgets/edit_wall_sheet.dart';
+import '../widgets/wall/edit_wall_sheet.dart';
 
 class WallListScreen extends StatefulWidget {
   WallListScreen({super.key});

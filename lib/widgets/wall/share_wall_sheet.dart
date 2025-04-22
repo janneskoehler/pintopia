@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:ui' as ui;
-import '../models/wall.dart';
+import '../../models/wall.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'copyable_link.dart';
+import '../common/copyable_link.dart';
 
 class ShareWallSheet extends StatelessWidget {
   final Wall wall;

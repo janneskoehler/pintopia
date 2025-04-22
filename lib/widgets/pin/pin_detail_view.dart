@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/attachment.dart';
-import '../models/pin.dart';
-import '../services/firebase_service.dart';
+import '../../models/attachment.dart';
+import '../../models/pin.dart';
+import '../../services/firebase_service.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class PinDetailView extends StatefulWidget {

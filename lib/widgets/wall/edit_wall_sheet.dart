@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/wall.dart';
-import '../services/firebase_service.dart';
+import '../../models/wall.dart';
+import '../../services/firebase_service.dart';
 import 'wall_form.dart';
-import 'sheet_bar.dart';
+import '../common/sheet_bar.dart';
 
 class EditWallSheet extends StatefulWidget {
   final Wall wall;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/pin.dart';
-import '../models/attachment.dart';
+import '../../models/pin.dart';
+import '../../models/attachment.dart';
 import 'pin_detail_view.dart';
 
 class PinCard extends StatelessWidget {
