@@ -6,8 +6,9 @@ import '../widgets/wall/share_wall_sheet.dart';
 import '../widgets/pin/pin_card.dart';
 import '../widgets/pin/pin_detail_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_reorderable_grid_view/widgets/widgets.dart';
 
-class WallDetailScreen extends StatelessWidget {
+class WallDetailScreen extends StatefulWidget {
   final String wallId;
   final FirebaseService _firebaseService = FirebaseService();
   final StorageService _storageService = StorageService();
@@ -18,9 +19,16 @@ class WallDetailScreen extends StatelessWidget {
   });
 
   @override
+  _WallDetailScreenState createState() => _WallDetailScreenState();
+}
+
+class _WallDetailScreenState extends State<WallDetailScreen> {
+  bool _isEditMode = false;
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _firebaseService.getWall(wallId),
+      future: widget._firebaseService.getWall(widget.wallId),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Scaffold(
@@ -54,7 +62,7 @@ class WallDetailScreen extends StatelessWidget {
             title: Text(wall.title),
             actions: [
               FutureBuilder<bool>(
-                future: _storageService.isAdminWall(wallId),
+                future: widget._storageService.isAdminWall(widget.wallId),
                 builder: (context, isAdminSnapshot) {
                   if (isAdminSnapshot.hasData && isAdminSnapshot.data == true) {
                     return Row(
@@ -70,7 +78,7 @@ class WallDetailScreen extends StatelessWidget {
 
                             final newPin = Pin(
                               id: newPinRef.id,
-                              wallId: wallId,
+                              wallId: widget.wallId,
                               title: '',
                               body: '',
                               color: Pin.getRandomColor(),
@@ -100,6 +108,14 @@ class WallDetailScreen extends StatelessWidget {
                             );
                           },
                         ),
+                        IconButton(
+                          icon: Icon(_isEditMode ? Icons.done : Icons.edit),
+                          onPressed: () {
+                            setState(() {
+                              _isEditMode = !_isEditMode;
+                            });
+                          },
+                        ),
                       ],
                     );
                   }
@@ -109,10 +125,10 @@ class WallDetailScreen extends StatelessWidget {
             ],
           ),
           body: StreamBuilder<List<Pin>>(
-            stream: _firebaseService.getPinsStream(wallId),
+            stream: widget._firebaseService.getPinsStream(widget.wallId),
             builder: (context, pinsSnapshot) {
               return FutureBuilder<bool>(
-                future: _storageService.isAdminWall(wallId),
+                future: widget._storageService.isAdminWall(widget.wallId),
                 builder: (context, isAdminSnapshot) {
                   if (pinsSnapshot.hasError) {
                     return Center(
@@ -127,7 +143,8 @@ class WallDetailScreen extends StatelessWidget {
                     );
                   }
 
-                  final pins = pinsSnapshot.data!;
+                  final pins = pinsSnapshot.data!
+                    ..sort((a, b) => a.position.compareTo(b.position));
                   final isAdmin = isAdminSnapshot.data ?? false;
 
                   if (pins.isEmpty) {
@@ -139,16 +156,30 @@ class WallDetailScreen extends StatelessWidget {
                     );
                   }
 
-                  return GridView.extent(
-                    maxCrossAxisExtent: 300,
-                    padding: const EdgeInsets.all(8.0),
-                    mainAxisSpacing: 16.0,
-                    crossAxisSpacing: 16.0,
-                    childAspectRatio: 1.0,
+                  return ReorderableBuilder(
+                    enableDraggable: _isEditMode && isAdmin,
+                    onReorder: _isEditMode
+                        ? (ReorderedListFunction reorderedListFunction) {
+                            setState(() {
+                              // TODO: Implement reordering logic
+                            });
+                          }
+                        : null,
+                    enableLongPress: false,
+                    builder: (children) => GridView.extent(
+                      maxCrossAxisExtent: 300,
+                      padding: const EdgeInsets.all(8.0),
+                      mainAxisSpacing: 16.0,
+                      crossAxisSpacing: 16.0,
+                      childAspectRatio: 1.0,
+                      children: children,
+                    ),
                     children: pins
                         .map((pin) => PinCard(
+                              key: ValueKey(pin.id),
                               pin: pin,
                               isAdmin: isAdmin,
+                              isEditMode: _isEditMode,
                             ))
                         .toList(),
                   );

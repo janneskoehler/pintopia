@@ -19,6 +19,7 @@ Pin _$PinFromJson(Map<String, dynamic> json) => Pin(
               ?.map((e) => Attachment.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      position: (json['position'] as num?)?.toInt() ?? 0,
       createdAt: Pin._dateTimeFromTimestamp(json['createdAt'] as Timestamp),
       updatedAt: Pin._dateTimeFromTimestamp(json['updatedAt'] as Timestamp),
     );
@@ -33,6 +34,7 @@ Map<String, dynamic> _$PinToJson(Pin instance) => <String, dynamic>{
       'urlLabel': instance.urlLabel,
       'directLink': instance.directLink,
       'attachments': instance.attachments,
+      'position': instance.position,
       'createdAt': Pin._timestampFromDateTime(instance.createdAt),
       'updatedAt': Pin._timestampFromDateTime(instance.updatedAt),
     };

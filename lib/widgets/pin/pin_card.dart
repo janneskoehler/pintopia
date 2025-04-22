@@ -7,31 +7,19 @@ import 'pin_detail_view.dart';
 class PinCard extends StatelessWidget {
   final Pin pin;
   final bool isAdmin;
+  final bool isEditMode;
 
   const PinCard({
     super.key,
     required this.pin,
     this.isAdmin = false,
+    this.isEditMode = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => _handleTap(context),
-      onLongPress: isAdmin
-          ? () {
-              showDialog(
-                context: context,
-                builder: (context) => Dialog(
-                  child: PinDetailView(
-                    pin: pin,
-                    isAdmin: true,
-                    initialEditMode: true,
-                  ),
-                ),
-              );
-            }
-          : null,
       child: Card(
         clipBehavior: Clip.antiAlias,
         elevation: 8.0,
@@ -90,6 +78,30 @@ class PinCard extends StatelessWidget {
                 ),
               ),
             ),
+            if (isAdmin && isEditMode)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: IconButton(
+                  icon: const Icon(Icons.edit),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black87,
+                  ),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => Dialog(
+                        child: PinDetailView(
+                          pin: pin,
+                          isAdmin: true,
+                          initialEditMode: true,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
           ],
         ),
       ),
