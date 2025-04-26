@@ -4,6 +4,7 @@ import '../../models/attachment.dart';
 import '../../models/pin.dart';
 import '../../services/firebase_service.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class PinDetailView extends StatefulWidget {
   final Pin pin;
@@ -250,6 +251,8 @@ class _PinDetailViewState extends State<PinDetailView> {
                                   .headlineLarge
                                   ?.copyWith(color: Colors.white),
                               textAlign: TextAlign.center,
+                              maxLength: 100,
+                              cursorColor: Colors.white,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.symmetric(
@@ -258,6 +261,7 @@ class _PinDetailViewState extends State<PinDetailView> {
                                 hintStyle: TextStyle(
                                   color: Colors.white54,
                                 ),
+                                counterText: '',
                               ),
                             )
                           : Text(
@@ -297,20 +301,43 @@ class _PinDetailViewState extends State<PinDetailView> {
                       ConstrainedBox(
                         constraints: const BoxConstraints(minHeight: 120),
                         child: _isEditMode
-                            ? TextField(
-                                controller: _bodyController,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                                minLines: 4,
-                                maxLines: null,
-                                textAlignVertical: TextAlignVertical.top,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Inhalt',
-                                ),
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextField(
+                                    controller: _bodyController,
+                                    style:
+                                        Theme.of(context).textTheme.bodyLarge,
+                                    minLines: 4,
+                                    maxLines: null,
+                                    maxLength: 5000,
+                                    textAlignVertical: TextAlignVertical.top,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Inhalt',
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () => launchUrl(Uri.parse(
+                                        'https://www.markdownguide.org/basic-syntax/')),
+                                    child: const Text(
+                                      'Markdown wird unterstützt. Klicke hier für eine Anleitung.',
+                                      style: TextStyle(
+                                        color: Colors.blue,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               )
-                            : Text(
-                                pin.body,
-                                style: Theme.of(context).textTheme.bodyLarge,
+                            : Markdown(
+                                data: pin.body,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                softLineBreak: true,
+                                styleSheet: MarkdownStyleSheet(
+                                  p: Theme.of(context).textTheme.bodyLarge,
+                                ),
                               ),
                       ),
                     ],
@@ -319,6 +346,7 @@ class _PinDetailViewState extends State<PinDetailView> {
                       if (_isEditMode) ...[
                         TextField(
                           controller: _urlController,
+                          maxLength: 200,
                           decoration: const InputDecoration(
                             labelText: 'Link (optional)',
                             border: OutlineInputBorder(),
@@ -328,6 +356,7 @@ class _PinDetailViewState extends State<PinDetailView> {
                           const SizedBox(height: 16.0),
                           TextField(
                             controller: _urlLabelController,
+                            maxLength: 100,
                             decoration: const InputDecoration(
                               labelText: 'Link Beschriftung (optional)',
                               border: OutlineInputBorder(),
