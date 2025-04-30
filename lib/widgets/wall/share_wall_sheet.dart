@@ -16,11 +16,11 @@ class ShareWallSheet extends StatelessWidget {
   });
 
   String _buildWallLink() {
-    return 'https://pintopia.de/wall/${wall.id}';
+    return 'https://app.pintopia.org/wall/${wall.id}';
   }
 
   String _buildAdminLink() {
-    return 'https://pintopia.de/wall/${wall.id}?a=${wall.adminCode}';
+    return 'https://app.pintopia.org/wall/${wall.id}?a=${wall.adminCode}';
   }
 
   Future<void> _saveQrCode(BuildContext context) async {
@@ -114,7 +114,7 @@ class ShareWallSheet extends StatelessWidget {
                       embeddedImage:
                           const AssetImage('assets/icons/icon_circle.png'),
                       embeddedImageStyle: QrEmbeddedImageStyle(
-                        size: const Size(40, 40),
+                        size: const Size(50, 50),
                       ),
                     ),
                   ),
