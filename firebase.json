@@ -1,1 +1,56 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"pintopia-2025","appId":"1:500161903549:android:c2f45f29fa0d0a8a8a30d4","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"pintopia-2025","appId":"1:500161903549:ios:c350151b1a7ce6e68a30d4","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"pintopia-2025","configurations":{"android":"1:500161903549:android:c2f45f29fa0d0a8a8a30d4","ios":"1:500161903549:ios:c350151b1a7ce6e68a30d4","web":"1:500161903549:web:98b097807715c5538a30d4"}}}}},"functions":[{"source":"functions","codebase":"default","ignore":["node_modules",".git","firebase-debug.log","firebase-debug.*.log","*.local"],"predeploy":["npm --prefix \"$RESOURCE_DIR\" run lint","npm --prefix \"$RESOURCE_DIR\" run build"]}]}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "pintopia-2025",
+          "appId": "1:500161903549:android:c2f45f29fa0d0a8a8a30d4",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "pintopia-2025",
+          "appId": "1:500161903549:ios:c350151b1a7ce6e68a30d4",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "pintopia-2025",
+          "configurations": {
+            "android": "1:500161903549:android:c2f45f29fa0d0a8a8a30d4",
+            "ios": "1:500161903549:ios:c350151b1a7ce6e68a30d4",
+            "web": "1:500161903549:web:98b097807715c5538a30d4"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint",
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ],
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

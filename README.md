@@ -1,6 +1,6 @@
-# pintopia
+# Pintopia
 
-A new Flutter project.
+The bulletin board for your club, your team, your friends.
 
 ## Getting Started
 

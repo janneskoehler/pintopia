@@ -29,6 +29,8 @@ migrate_working_dir/
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
+.packages
+build/
 .pub-cache/
 .pub/
 /build/
@@ -43,3 +45,26 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase
+.firebase/
+firebase-debug.log
+.firebaserc
+**/firebase-debug.*.log
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Secrets
+lib/firebase_options.dart
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+
+# Web
+web/firebase-messaging-sw.js
+
+# Hosting Cache
+.firebase/hosting.*
+.firebase/hosting/**
