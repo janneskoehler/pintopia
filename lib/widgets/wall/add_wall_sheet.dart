@@ -123,32 +123,43 @@ class _AddWallSheetState extends State<AddWallSheet> {
   void _openExistingBoard() async {
     if (idController.text.isEmpty) return;
 
-    try {
-      final boardId = idController.text;
-      await widget.storageService.addWall(boardId);
+    String? wallId;
+    String? adminCode;
 
-      if (mounted) {
-        Navigator.pop(context);
-        context.goNamed(
-          'wall-detail',
-          pathParameters: {'id': boardId},
-        );
+    try {
+      final uri = Uri.parse(idController.text);
+      final segments = uri.pathSegments;
+      if (segments.length >= 2 && segments[0] == 'wall') {
+        wallId = segments[1];
+        adminCode = uri.queryParameters['a'];
       }
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Fehler'),
-            content: Text('Fehler beim Öffnen der Pinnwand: $e'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
+      // Versuche direkte Eingabe als wallId zu verwenden
+      wallId = idController.text;
+    }
+
+    if (wallId == null) return;
+
+    final wall = await _firebaseService.getWall(wallId);
+    if (wall == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pinnwand nicht gefunden')),
+      );
+      return;
+    }
+
+    if (adminCode != null && adminCode == wall.adminCode) {
+      await widget.storageService.addWall(wallId, isAdmin: true);
+    } else {
+      await widget.storageService.addWall(wallId);
+    }
+
+    if (mounted) {
+      Navigator.pop(context);
+      context.goNamed(
+        'wall-detail',
+        pathParameters: {'id': wallId},
       );
     }
   }
@@ -179,7 +190,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
                       minimumSize: Size.zero,
                       padding: const EdgeInsets.all(8),
                     ),
-                    child: const Text('Erstellen'),
+                    child: Text(isCreatingNew ? 'Erstellen' : 'Öffnen'),
                   )
                 : null,
           ),
@@ -240,9 +251,24 @@ class _AddWallSheetState extends State<AddWallSheet> {
                       : TextField(
                           controller: idController,
                           decoration: const InputDecoration(
-                            labelText: 'Pinnwand ID',
-                            hintText: 'Geben Sie die Pinnwand ID ein',
+                            labelText: 'Pinnwand Link',
+                            hintText: 'https://app.pintopia.org/wall/...',
                           ),
+                          onChanged: (value) {
+                            try {
+                              final uri = Uri.parse(value);
+                              final segments = uri.pathSegments;
+                              if (segments.length >= 2 &&
+                                  segments[0] == 'wall') {
+                                final adminCode = uri.queryParameters['a'];
+                                if (adminCode != null) {
+                                  // Handle admin code
+                                }
+                              }
+                            } catch (e) {
+                              // Invalid URL format
+                            }
+                          },
                         ),
                 ),
               ],
