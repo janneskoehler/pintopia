@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 class NotificationService {
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -9,6 +10,11 @@ class NotificationService {
   NotificationService(this._prefs);
 
   Future<void> init() async {
+    if (kIsWeb) {
+      // Web-Push vorerst deaktiviert
+      return;
+    }
+
     // Berechtigungen anfordern
     NotificationSettings settings = await _messaging.requestPermission(
       alert: true,
@@ -33,6 +39,11 @@ class NotificationService {
   }
 
   Future<void> subscribeToWall(String wallId) async {
+    if (kIsWeb) {
+      // Web-Push vorerst deaktiviert
+      return;
+    }
+
     final key = 'subscribed_$wallId';
     final alreadySubscribed = _prefs.getBool(key) ?? false;
 
