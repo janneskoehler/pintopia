@@ -112,7 +112,7 @@ class ShareWallSheet extends StatelessWidget {
                       version: QrVersions.auto,
                       size: 200.0,
                       embeddedImage:
-                          const AssetImage('assets/images/pin_icon.png'),
+                          const AssetImage('assets/icons/icon_circle.png'),
                       embeddedImageStyle: QrEmbeddedImageStyle(
                         size: const Size(40, 40),
                       ),
