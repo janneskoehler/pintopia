@@ -7,7 +7,9 @@ import 'package:go_router/go_router.dart';
 import '../widgets/wall/edit_wall_sheet.dart';
 
 class WallListScreen extends StatefulWidget {
-  WallListScreen({super.key});
+  WallListScreen({super.key, required this.storageService});
+
+  final StorageService storageService;
 
   @override
   State<WallListScreen> createState() => _WallListScreenState();
@@ -15,11 +17,10 @@ class WallListScreen extends StatefulWidget {
 
 class _WallListScreenState extends State<WallListScreen> {
   final FirebaseService _firebaseService = FirebaseService();
-  final StorageService _storageService = StorageService();
   bool _isEditMode = false;
 
   Future<List<Wall>> _loadWalls() async {
-    final wallIds = await _storageService.getWalls();
+    final wallIds = await widget.storageService.getWalls();
     final List<Wall> walls = [];
 
     for (final wallId in wallIds) {
@@ -33,7 +34,7 @@ class _WallListScreenState extends State<WallListScreen> {
   }
 
   void _showBoardSheet(BuildContext context) {
-    AddWallSheet.show(context);
+    AddWallSheet.show(context, widget.storageService);
   }
 
   void _toggleEditMode() {
@@ -146,7 +147,8 @@ class _WallListScreenState extends State<WallListScreen> {
                             ),
                             if (_isEditMode)
                               FutureBuilder<bool>(
-                                future: _storageService.isAdminWall(wall.id),
+                                future:
+                                    widget.storageService.isAdminWall(wall.id),
                                 builder: (context, snapshot) {
                                   if (!snapshot.hasData ||
                                       snapshot.data != true) {

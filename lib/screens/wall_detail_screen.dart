@@ -7,15 +7,19 @@ import '../widgets/pin/pin_card.dart';
 import '../widgets/pin/pin_detail_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_reorderable_grid_view/widgets/widgets.dart';
+import '../services/notification_service.dart';
 
 class WallDetailScreen extends StatefulWidget {
   final String wallId;
   final FirebaseService _firebaseService = FirebaseService();
-  final StorageService _storageService = StorageService();
+  final StorageService storageService;
+  final NotificationService notificationService;
 
   WallDetailScreen({
     super.key,
     required this.wallId,
+    required this.notificationService,
+    required this.storageService,
   });
 
   @override
@@ -24,6 +28,16 @@ class WallDetailScreen extends StatefulWidget {
 
 class _WallDetailScreenState extends State<WallDetailScreen> {
   bool _isEditMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscribeToNotifications();
+  }
+
+  Future<void> _subscribeToNotifications() async {
+    await widget.notificationService.subscribeToWall(widget.wallId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +76,7 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
             title: Text(wall.title),
             actions: [
               FutureBuilder<bool>(
-                future: widget._storageService.isAdminWall(widget.wallId),
+                future: widget.storageService.isAdminWall(widget.wallId),
                 builder: (context, isAdminSnapshot) {
                   if (isAdminSnapshot.hasData && isAdminSnapshot.data == true) {
                     return Row(
@@ -105,7 +119,7 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
             stream: widget._firebaseService.getPinsStream(widget.wallId),
             builder: (context, pinsSnapshot) {
               return FutureBuilder<bool>(
-                future: widget._storageService.isAdminWall(widget.wallId),
+                future: widget.storageService.isAdminWall(widget.wallId),
                 builder: (context, isAdminSnapshot) {
                   if (pinsSnapshot.hasError) {
                     return Center(

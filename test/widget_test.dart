@@ -9,11 +9,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:pintopia/main.dart';
+import 'package:pintopia/router.dart';
+import 'package:pintopia/services/notification_service.dart';
+import 'package:pintopia/services/storage_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    final pref = await SharedPreferences.getInstance();
+    final notificationService = NotificationService(pref);
+    final storageService = StorageService(pref);
+    await tester.pumpWidget(MyApp(
+      router: getRouter(notificationService, storageService),
+      notificationService: notificationService,
+    ));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

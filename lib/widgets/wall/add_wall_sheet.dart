@@ -6,14 +6,16 @@ import '../../services/storage_service.dart';
 import '../common/sheet_bar.dart';
 
 class AddWallSheet extends StatefulWidget {
-  const AddWallSheet({super.key});
+  const AddWallSheet({super.key, required this.storageService});
 
-  static void show(BuildContext context) {
+  final StorageService storageService;
+
+  static void show(BuildContext context, StorageService storageService) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => const AddWallSheet(),
+      builder: (context) => AddWallSheet(storageService: storageService),
     );
   }
 
@@ -29,7 +31,6 @@ class _AddWallSheetState extends State<AddWallSheet> {
   bool isCreatingNew = true;
   bool isSecondPage = false;
   final FirebaseService _firebaseService = FirebaseService();
-  final StorageService _storageService = StorageService();
 
   @override
   void dispose() {
@@ -90,8 +91,8 @@ class _AddWallSheetState extends State<AddWallSheet> {
         selectedAssetImage!,
       );
 
-      await _storageService.addWall(wall.id, isAdmin: true);
-      await _storageService.saveLastWallId(wall.id);
+      await widget.storageService.addWall(wall.id, isAdmin: true);
+      await widget.storageService.saveLastWallId(wall.id);
 
       if (mounted) {
         Navigator.pop(context);
@@ -124,7 +125,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
 
     try {
       final boardId = idController.text;
-      await _storageService.addWall(boardId);
+      await widget.storageService.addWall(boardId);
 
       if (mounted) {
         Navigator.pop(context);
