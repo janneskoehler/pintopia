@@ -188,9 +188,16 @@ class _WallListScreenState extends State<WallListScreen> {
                       children: [
                         AspectRatio(
                           aspectRatio: 16 / 9,
-                          child: Image.asset(
-                            'assets/images/pinboard.png',
-                            fit: BoxFit.cover,
+                          child: Container(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            child: Icon(
+                              Icons.add,
+                              size: 48,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
+                            ),
                           ),
                         ),
                         Expanded(

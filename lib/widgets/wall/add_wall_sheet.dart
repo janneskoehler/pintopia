@@ -168,6 +168,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
+      constraints: const BoxConstraints(maxHeight: 640),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
