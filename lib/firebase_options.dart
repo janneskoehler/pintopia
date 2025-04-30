@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -51,7 +48,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBz48DP3ZaX6oX4TnTfZfeladPX73b0orE',
-    appId: '1:500161903549:android:451c63c34f9a54788a30d4',
+    appId: '1:500161903549:android:c2f45f29fa0d0a8a8a30d4',
     messagingSenderId: '500161903549',
     projectId: 'pintopia-2025',
     storageBucket: 'pintopia-2025.firebasestorage.app',
@@ -59,10 +56,21 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAeZ1a2F9LZL5B93m4UqGdw92jaW3Sv-GA',
-    appId: '1:500161903549:ios:8d807156698a9a8d8a30d4',
+    appId: '1:500161903549:ios:c350151b1a7ce6e68a30d4',
     messagingSenderId: '500161903549',
     projectId: 'pintopia-2025',
     storageBucket: 'pintopia-2025.firebasestorage.app',
-    iosBundleId: 'com.example.pintopia',
+    iosBundleId: 'org.pintopia.app',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyBfbhRKTd_2V5szemQrdDV2crQstJZWNDg',
+    appId: '1:500161903549:web:98b097807715c5538a30d4',
+    messagingSenderId: '500161903549',
+    projectId: 'pintopia-2025',
+    authDomain: 'pintopia-2025.firebaseapp.com',
+    storageBucket: 'pintopia-2025.firebasestorage.app',
+    measurementId: 'G-2VB5G1YS2T',
+  );
+
 }

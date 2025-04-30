@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.pintopia</string>
+	<string>org.pintopia.app</string>
 	<key>PROJECT_ID</key>
 	<string>pintopia-2025</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:500161903549:ios:8d807156698a9a8d8a30d4</string>
+	<string>1:500161903549:ios:c350151b1a7ce6e68a30d4</string>
 </dict>
 </plist>

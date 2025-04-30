@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:500161903549:android:451c63c34f9a54788a30d4",
+        "mobilesdk_app_id": "1:500161903549:android:c2f45f29fa0d0a8a8a30d4",
         "android_client_info": {
-          "package_name": "com.example.pintopia"
+          "package_name": "org.pintopia.app"
         }
       },
       "oauth_client": [],
