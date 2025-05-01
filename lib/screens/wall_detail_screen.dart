@@ -23,7 +23,7 @@ class WallDetailScreen extends StatefulWidget {
   });
 
   @override
-  _WallDetailScreenState createState() => _WallDetailScreenState();
+  State<WallDetailScreen> createState() => _WallDetailScreenState();
 }
 
 class _WallDetailScreenState extends State<WallDetailScreen> {

@@ -89,20 +89,23 @@ class _PinDetailViewState extends State<PinDetailView> {
         await _firebaseService.updatePin(updatedPin);
       }
 
-      if (context.mounted) {
+      if (mounted) {
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
-        final dialogContext = context;
         await showDialog(
-          context: dialogContext,
+          context: context,
           builder: (BuildContext context) => AlertDialog(
             title: const Text('Fehler beim Speichern'),
             content: Text(e.toString()),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
+                onPressed: () {
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
+                },
                 child: const Text('OK'),
               ),
             ],
@@ -372,7 +375,7 @@ class _PinDetailViewState extends State<PinDetailView> {
                               if (await canLaunchUrl(url)) {
                                 await launchUrl(url);
                               } else {
-                                if (context.mounted) {
+                                if (mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(
@@ -382,7 +385,7 @@ class _PinDetailViewState extends State<PinDetailView> {
                                 }
                               }
                             } catch (e) {
-                              if (context.mounted) {
+                              if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('Ungültiger Link'),
@@ -444,12 +447,12 @@ class _PinDetailViewState extends State<PinDetailView> {
       ),
     );
 
-    if (shouldDelete == true && context.mounted) {
+    if (shouldDelete == true && mounted) {
       try {
         Navigator.of(context).pop(); // Schließe zuerst den Detail-Dialog
         await _firebaseService.deletePin(widget.pin);
       } catch (e) {
-        if (context.mounted) {
+        if (mounted) {
           await showDialog(
             context: context,
             builder: (BuildContext context) => AlertDialog(

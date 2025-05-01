@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../widgets/wall/edit_wall_sheet.dart';
 
 class WallListScreen extends StatefulWidget {
-  WallListScreen({super.key, required this.storageService});
+  const WallListScreen({super.key, required this.storageService});
 
   final StorageService storageService;
 
