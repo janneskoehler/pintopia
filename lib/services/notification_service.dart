@@ -2,12 +2,53 @@ import 'dart:io' show Platform;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logger/logger.dart';
+import 'logger_service.dart';
+
+class NotificationServiceException implements Exception {
+  final String message;
+  final String? code;
+  final String? details;
+
+  NotificationServiceException({
+    required this.message,
+    this.code,
+    this.details,
+  });
+
+  @override
+  String toString() =>
+      'NotificationServiceException: $message\nCode: $code\nDetails: $details';
+}
 
 class NotificationService {
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-  final SharedPreferences _prefs;
+  static const String _adminTopic = 'admin';
+  static const String _userTopic = 'user';
 
-  NotificationService(this._prefs);
+  final FirebaseMessaging _messaging;
+  final SharedPreferences _prefs;
+  final Logger _logger = LoggerService.getLogger();
+
+  NotificationService({
+    FirebaseMessaging? messaging,
+    required SharedPreferences prefs,
+  }) : _messaging = messaging ?? FirebaseMessaging.instance,
+       _prefs = prefs;
+
+  Future<T> _handleNotificationOperation<T>(
+    Future<T> Function() operation, {
+    String operationName = 'Notification operation',
+  }) async {
+    try {
+      return await operation();
+    } catch (e) {
+      _logger.e('Failed $operationName: $e');
+      throw NotificationServiceException(
+        message: 'Error occurred during $operationName',
+        details: e.toString(),
+      );
+    }
+  }
 
   Future<void> init() async {
     if (kIsWeb) {

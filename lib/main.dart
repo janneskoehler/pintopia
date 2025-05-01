@@ -15,7 +15,7 @@ void main() async {
   );
 
   final prefs = await SharedPreferences.getInstance();
-  final notificationService = NotificationService(prefs);
+  final notificationService = NotificationService(prefs: prefs);
   final storageService = StorageService(prefs);
   await notificationService.init();
 

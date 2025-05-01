@@ -18,7 +18,7 @@ void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     final pref = await SharedPreferences.getInstance();
-    final notificationService = NotificationService(pref);
+    final notificationService = NotificationService(prefs: pref);
     final storageService = StorageService(pref);
     await tester.pumpWidget(MyApp(
       router: getRouter(notificationService, storageService),
