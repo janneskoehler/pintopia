@@ -33,7 +33,7 @@ class _WallListScreenState extends State<WallListScreen> {
     return walls;
   }
 
-  void _showBoardSheet(BuildContext context) {
+  void _showWallSheet(BuildContext context) {
     AddWallSheet.show(context, widget.storageService);
   }
 
@@ -178,11 +178,11 @@ class _WallListScreenState extends State<WallListScreen> {
                         ),
                       ),
                     )),
-                // New Board Element -> New Wall Element
+                // New Wall Element
                 Card(
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
-                    onTap: () => _showBoardSheet(context),
+                    onTap: () => _showWallSheet(context),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [

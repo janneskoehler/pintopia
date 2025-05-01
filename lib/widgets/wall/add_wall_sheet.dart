@@ -63,7 +63,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
     }
   }
 
-  Future<void> _createNewBoard() async {
+  Future<void> _createNewWall() async {
     if (nameController.text.isEmpty) {
       showDialog(
         context: context,
@@ -102,25 +102,28 @@ class _AddWallSheetState extends State<AddWallSheet> {
         );
       }
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Fehler'),
-            content: Text('Fehler beim Erstellen der Pinnwand: $e'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      if (context.mounted) {
+        final dialogContext = context;
+        showDialog(
+          context: dialogContext,
+          builder: (BuildContext dialogContext) {
+            return AlertDialog(
+              title: const Text('Fehler'),
+              content: Text('Fehler beim Erstellen der Pinnwand: $e'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
-  void _openExistingBoard() async {
+  void _openExistingWall() async {
     if (idController.text.isEmpty) return;
 
     String? wallId;
@@ -166,6 +169,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
 
   @override
   Widget build(BuildContext context) {
+    if (!mounted) return const SizedBox.shrink();
     return Container(
       padding: const EdgeInsets.all(16),
       constraints: const BoxConstraints(maxHeight: 640),
@@ -186,7 +190,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
             rightAction: isSecondPage
                 ? TextButton(
                     onPressed:
-                        isCreatingNew ? _createNewBoard : _openExistingBoard,
+                        isCreatingNew ? _createNewWall : _openExistingWall,
                     style: TextButton.styleFrom(
                       minimumSize: Size.zero,
                       padding: const EdgeInsets.all(8),

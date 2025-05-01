@@ -93,15 +93,16 @@ class _PinDetailViewState extends State<PinDetailView> {
         Navigator.of(context).pop();
       }
     } catch (e) {
-      if (context.mounted) {
+      if (mounted) {
+        final dialogContext = context;
         await showDialog(
-          context: context,
+          context: dialogContext,
           builder: (BuildContext context) => AlertDialog(
             title: const Text('Fehler beim Speichern'),
             content: Text(e.toString()),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.of(dialogContext).pop(),
                 child: const Text('OK'),
               ),
             ],
@@ -173,7 +174,7 @@ class _PinDetailViewState extends State<PinDetailView> {
                       ),
                     Container(
                       decoration: BoxDecoration(
-                        color: _selectedColor.withOpacity(0.7),
+                        color: _selectedColor.withValues(alpha: 0.7),
                       ),
                     ),
                     if (widget.isAdmin)

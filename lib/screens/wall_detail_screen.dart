@@ -11,7 +11,7 @@ import '../services/notification_service.dart';
 
 class WallDetailScreen extends StatefulWidget {
   final String wallId;
-  final FirebaseService _firebaseService = FirebaseService();
+  final FirebaseService firebaseService = FirebaseService();
   final StorageService storageService;
   final NotificationService notificationService;
 
@@ -42,7 +42,7 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: widget._firebaseService.getWall(widget.wallId),
+      future: widget.firebaseService.getWall(widget.wallId),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Scaffold(
@@ -116,7 +116,7 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
             ],
           ),
           body: StreamBuilder<List<Pin>>(
-            stream: widget._firebaseService.getPinsStream(widget.wallId),
+            stream: widget.firebaseService.getPinsStream(widget.wallId),
             builder: (context, pinsSnapshot) {
               return FutureBuilder<bool>(
                 future: widget.storageService.isAdminWall(widget.wallId),
@@ -157,7 +157,7 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
                               for (var i = 0; i < reorderedList.length; i++) {
                                 final pin = reorderedList[i];
                                 if (pin.position != i) {
-                                  updates.add(widget._firebaseService.updatePin(
+                                  updates.add(widget.firebaseService.updatePin(
                                     pin.copyWith(position: i),
                                   ));
                                 }

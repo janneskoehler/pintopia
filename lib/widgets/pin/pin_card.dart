@@ -26,7 +26,7 @@ class PinCard extends StatelessWidget {
       child: Card(
         clipBehavior: Clip.antiAlias,
         elevation: 8.0,
-        shadowColor: Colors.black.withOpacity(0.4),
+        shadowColor: Colors.black.withValues(alpha: 0.4),
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -49,7 +49,7 @@ class PinCard extends StatelessWidget {
               ),
             Container(
               decoration: BoxDecoration(
-                color: pin.color.withOpacity(0.7),
+                color: pin.color.withValues(alpha: 0.7),
               ),
             ),
             Center(

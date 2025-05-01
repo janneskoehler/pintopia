@@ -22,9 +22,6 @@ class NotificationServiceException implements Exception {
 }
 
 class NotificationService {
-  static const String _adminTopic = 'admin';
-  static const String _userTopic = 'user';
-
   final FirebaseMessaging _messaging;
   final SharedPreferences _prefs;
   final Logger _logger = LoggerService.getLogger();
@@ -32,23 +29,8 @@ class NotificationService {
   NotificationService({
     FirebaseMessaging? messaging,
     required SharedPreferences prefs,
-  }) : _messaging = messaging ?? FirebaseMessaging.instance,
-       _prefs = prefs;
-
-  Future<T> _handleNotificationOperation<T>(
-    Future<T> Function() operation, {
-    String operationName = 'Notification operation',
-  }) async {
-    try {
-      return await operation();
-    } catch (e) {
-      _logger.e('Failed $operationName: $e');
-      throw NotificationServiceException(
-        message: 'Error occurred during $operationName',
-        details: e.toString(),
-      );
-    }
-  }
+  })  : _messaging = messaging ?? FirebaseMessaging.instance,
+        _prefs = prefs;
 
   Future<void> init() async {
     if (kIsWeb) {
@@ -65,13 +47,13 @@ class NotificationService {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       // First register for Remote Notifications
-      await FirebaseMessaging.instance.setAutoInitEnabled(true);
+      await _messaging.setAutoInitEnabled(true);
 
       // Get APNS Token for iOS
       if (Platform.isIOS) {
         await Future.delayed(const Duration(seconds: 1)); // Wait a moment
         String? apnsToken = await _messaging.getAPNSToken();
-        print('APNS Token: $apnsToken');
+        _logger.d('APNS Token: $apnsToken');
       }
 
       // Configure foreground messages
@@ -101,6 +83,6 @@ class NotificationService {
 
   void _handleForegroundMessage(RemoteMessage message) {
     // Here you can process the message, e.g. display a local notification
-    print('Received foreground message: ${message.notification?.title}');
+    _logger.d('Received foreground message: ${message.notification?.title}');
   }
 }
