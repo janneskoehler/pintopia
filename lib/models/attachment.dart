@@ -8,8 +8,8 @@ enum AttachmentType { image, file }
 class Attachment {
   final String url;
   final AttachmentType type;
-  final String? fileName; // Optional, hauptsächlich für Dateien
-  final String? mimeType; // Für Dateityp-Identifikation
+  final String? fileName; // Optional, mainly for files
+  final String? mimeType; // For file type identification
 
   Attachment({
     required this.url,

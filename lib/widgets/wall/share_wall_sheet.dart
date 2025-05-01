@@ -16,11 +16,11 @@ class ShareWallSheet extends StatelessWidget {
   });
 
   String _buildWallLink() {
-    return 'https://app.pintopia.org/wall/${wall.id}';
+    return 'https://app.pintopia.org/#/wall/${wall.id}';
   }
 
   String _buildAdminLink() {
-    return 'https://app.pintopia.org/wall/${wall.id}?a=${wall.adminCode}';
+    return 'https://app.pintopia.org/#/wall/${wall.id}?a=${wall.adminCode}';
   }
 
   Future<void> _saveQrCode(BuildContext context) async {
@@ -33,7 +33,7 @@ class ShareWallSheet extends StatelessWidget {
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) return;
 
-      // Speichern in der Galerie
+      // Save to gallery
       await ImageGallerySaver.saveImage(
         byteData.buffer.asUint8List(),
         name: 'qr_code_${wall.id}',

@@ -178,7 +178,7 @@ class _WallListScreenState extends State<WallListScreen> {
                         ),
                       ),
                     )),
-                // Neues Board Element -> Neue Pinnwand Element
+                // New Board Element -> New Wall Element
                 Card(
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(

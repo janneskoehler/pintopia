@@ -18,14 +18,14 @@ class StorageService {
   }
 
   Future<void> addWall(String wallId, {bool isAdmin = false}) async {
-    // Füge zur allgemeinen Wall-Liste hinzu
+    // Add to general wall list
     final List<String> wallIds = await getWalls();
     if (!wallIds.contains(wallId)) {
       wallIds.add(wallId);
       await _prefs.setStringList(_wallsKey, wallIds);
     }
 
-    // Wenn es eine Admin-Wall ist, füge sie auch zur Admin-Liste hinzu
+    // If it's an admin wall, add it to the admin list as well
     if (isAdmin) {
       final List<String> adminWallIds = await getAdminWalls();
       if (!adminWallIds.contains(wallId)) {
@@ -44,12 +44,12 @@ class StorageService {
   }
 
   Future<void> removeWall(String wallId) async {
-    // Entferne aus der allgemeinen Wall-Liste
+    // Remove from the general wall list
     final List<String> wallIds = await getWalls();
     wallIds.remove(wallId);
     await _prefs.setStringList(_wallsKey, wallIds);
 
-    // Entferne auch aus der Admin-Liste
+    // Also remove from the admin list
     final List<String> adminWallIds = await getAdminWalls();
     adminWallIds.remove(wallId);
     await _prefs.setStringList(_adminWallsKey, adminWallIds);

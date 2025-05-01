@@ -15,7 +15,7 @@ class NotificationService {
       return;
     }
 
-    // Berechtigungen anfordern
+    // Request permissions
     NotificationSettings settings = await _messaging.requestPermission(
       alert: true,
       badge: true,
@@ -23,17 +23,17 @@ class NotificationService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      // Erst für Remote Notifications registrieren
+      // First register for Remote Notifications
       await FirebaseMessaging.instance.setAutoInitEnabled(true);
 
-      // APNS Token für iOS abrufen
+      // Get APNS Token for iOS
       if (Platform.isIOS) {
-        await Future.delayed(const Duration(seconds: 1)); // Kurz warten
+        await Future.delayed(const Duration(seconds: 1)); // Wait a moment
         String? apnsToken = await _messaging.getAPNSToken();
         print('APNS Token: $apnsToken');
       }
 
-      // Foreground Nachrichten konfigurieren
+      // Configure foreground messages
       FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
     }
   }
@@ -59,7 +59,7 @@ class NotificationService {
   }
 
   void _handleForegroundMessage(RemoteMessage message) {
-    // Hier können Sie die Nachricht verarbeiten, z.B. eine lokale Notification anzeigen
+    // Here you can process the message, e.g. display a local notification
     print('Received foreground message: ${message.notification?.title}');
   }
 }

@@ -40,11 +40,11 @@ class Pin {
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
-  // Factory-Konstruktor und toJson-Methode werden automatisch generiert
+  // Factory constructor and toJson method are automatically generated
   factory Pin.fromJson(Map<String, dynamic> json) => _$PinFromJson(json);
   Map<String, dynamic> toJson() => _$PinToJson(this);
 
-  // Für die JSON-Serialisierung
+  // For JSON serialization
   @JsonKey(fromJson: _colorFromJson, toJson: _colorToJson)
   Color get colorValue => color;
 

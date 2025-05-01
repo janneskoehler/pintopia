@@ -134,7 +134,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
         adminCode = uri.queryParameters['a'];
       }
     } catch (e) {
-      // Versuche direkte Eingabe als wallId zu verwenden
+      // Try to use direct input as wallId
       wallId = idController.text;
     }
 
@@ -201,7 +201,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
               controller: pageController,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                // Erste Seite: Auswahl
+                // First page: Selection
                 SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -237,7 +237,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
                     ],
                   ),
                 ),
-                // Zweite Seite: Formular
+                // Second page: Form
                 SingleChildScrollView(
                   child: isCreatingNew
                       ? WallForm(

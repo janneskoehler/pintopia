@@ -11,7 +11,7 @@ class FirebaseService {
     final wall = Wall(
       id: docRef.id,
       title: title,
-      imageUrl: '', // Leer, da wir Asset-Bilder verwenden
+      imageUrl: '', // Empty, since we use asset images
       assetImageName: assetImageName,
       adminCode: Wall.generateAdminCode(),
     );

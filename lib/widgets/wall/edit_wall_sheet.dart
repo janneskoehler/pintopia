@@ -119,9 +119,9 @@ class _EditWallSheetState extends State<EditWallSheet> {
             onPressed: () async {
               await widget.firebaseService.deleteWall(widget.wallId);
               if (context.mounted) {
-                Navigator.pop(context); // Dialog schließen
-                Navigator.pop(context); // Settings-Sheet schließen
-                Navigator.pop(context); // Zurück zur Übersicht
+                Navigator.pop(context); // Close dialog
+                Navigator.pop(context); // Close settings sheet
+                Navigator.pop(context); // Back to overview
               }
             },
             child: const Text('Löschen'),

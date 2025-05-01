@@ -26,7 +26,7 @@ class Wall {
     required this.adminCode,
   });
 
-  // Factory-Konstruktor und toJson-Methode werden automatisch generiert
+  // Factory constructor and toJson method are automatically generated
   factory Wall.fromJson(Map<String, dynamic> json) => _$WallFromJson(json);
   Map<String, dynamic> toJson() => _$WallToJson(this);
 
