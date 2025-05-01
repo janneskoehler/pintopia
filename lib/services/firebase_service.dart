@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logger/logger.dart';
-import 'logger_service.dart';
-import '../models/wall.dart';
-import '../models/pin.dart';
+import 'package:pintopia/models/pin.dart';
+import 'package:pintopia/models/wall.dart';
 
 class FirebaseServiceException implements Exception {
   final String message;
@@ -22,7 +21,11 @@ class FirebaseServiceException implements Exception {
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final Logger _logger = LoggerService.getLogger();
+  final Logger _logger = Logger(
+    printer: PrettyPrinter(
+      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
+    ),
+  );
 
   Future<T> _handleFirestoreOperation<T>(
     Future<T> Function() operation, {
@@ -75,12 +78,17 @@ class FirebaseService {
   }
 
   Stream<List<Wall>> getWalls() {
-    return _firestore.collection('walls').snapshots().map((snapshot) =>
-        snapshot.docs.map((doc) => Wall.fromJson(doc.data())).toList());
+    return _firestore.collection('walls').snapshots().map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Wall.fromJson(doc.data())).toList(),
+        );
   }
 
   Future<void> updateWall(
-      String id, String title, String assetImageName) async {
+    String id,
+    String title,
+    String assetImageName,
+  ) async {
     final wallRef = _firestore.collection('walls').doc(id);
 
     await wallRef.update({
@@ -104,9 +112,11 @@ class FirebaseService {
         .doc(wallId)
         .collection('pins')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Pin.fromJson({...doc.data(), 'id': doc.id}))
-            .toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Pin.fromJson({...doc.data(), 'id': doc.id}))
+              .toList(),
+        );
   }
 
   Future<void> createPin(Pin pin) async {

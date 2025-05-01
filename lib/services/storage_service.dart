@@ -1,6 +1,5 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
-import 'logger_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageServiceException implements Exception {
   final String message;
@@ -21,7 +20,11 @@ class StorageService {
   static const String _adminWallsKey = 'admin_wall_ids';
 
   final SharedPreferences _prefs;
-  final Logger _logger = LoggerService.getLogger();
+  final Logger _logger = Logger(
+    printer: PrettyPrinter(
+      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
+    ),
+  );
 
   StorageService(this._prefs);
 

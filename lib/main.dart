@@ -1,12 +1,12 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'router.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'theme.dart';
+import 'package:pintopia/firebase_options.dart';
+import 'package:pintopia/router.dart';
+import 'package:pintopia/services/notification_service.dart';
+import 'package:pintopia/services/storage_service.dart';
+import 'package:pintopia/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'services/notification_service.dart';
-import 'services/storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,19 +19,18 @@ void main() async {
   final storageService = StorageService(prefs);
   await notificationService.init();
 
-  runApp(MyApp(
-    router: getRouter(notificationService, storageService),
-    notificationService: notificationService,
-  ));
+  runApp(
+    MyApp(
+      router: getRouter(notificationService, storageService),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  final NotificationService notificationService;
   final GoRouter router;
 
   const MyApp({
     super.key,
-    required this.notificationService,
     required this.router,
   });
 

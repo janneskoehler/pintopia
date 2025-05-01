@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pintopia/models/attachment.dart';
+import 'package:pintopia/models/pin.dart';
+import 'package:pintopia/widgets/pin/pin_detail_view.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../models/pin.dart';
-import '../../models/attachment.dart';
-import 'pin_detail_view.dart';
 
 class PinCard extends StatelessWidget {
   final Pin pin;

@@ -1,5 +1,6 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'dart:math';
+
+import 'package:json_annotation/json_annotation.dart';
 
 part 'wall.g.dart';
 

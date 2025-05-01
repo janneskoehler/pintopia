@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../models/wall.dart';
-import '../../services/firebase_service.dart';
-import 'wall_form.dart';
-import '../common/sheet_bar.dart';
+import 'package:pintopia/models/wall.dart';
+import 'package:pintopia/services/firebase_service.dart';
+import 'package:pintopia/widgets/common/sheet_bar.dart';
+import 'package:pintopia/widgets/wall/wall_form.dart';
 
 class EditWallSheet extends StatefulWidget {
   final Wall wall;

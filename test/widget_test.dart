@@ -20,10 +20,11 @@ void main() {
     final pref = await SharedPreferences.getInstance();
     final notificationService = NotificationService(prefs: pref);
     final storageService = StorageService(pref);
-    await tester.pumpWidget(MyApp(
-      router: getRouter(notificationService, storageService),
-      notificationService: notificationService,
-    ));
+    await tester.pumpWidget(
+      MyApp(
+        router: getRouter(notificationService, storageService),
+      ),
+    );
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

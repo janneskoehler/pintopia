@@ -1,8 +1,9 @@
 import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'attachment.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pintopia/models/attachment.dart';
 
 part 'pin.g.dart';
 

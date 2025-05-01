@@ -1,9 +1,9 @@
 import 'dart:io' show Platform;
+
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
-import 'logger_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationServiceException implements Exception {
   final String message;
@@ -24,7 +24,11 @@ class NotificationServiceException implements Exception {
 class NotificationService {
   final FirebaseMessaging _messaging;
   final SharedPreferences _prefs;
-  final Logger _logger = LoggerService.getLogger();
+  final Logger _logger = Logger(
+    printer: PrettyPrinter(
+      dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
+    ),
+  );
 
   NotificationService({
     FirebaseMessaging? messaging,
@@ -39,11 +43,7 @@ class NotificationService {
     }
 
     // Request permissions
-    NotificationSettings settings = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    final NotificationSettings settings = await _messaging.requestPermission();
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       // First register for Remote Notifications
@@ -52,7 +52,7 @@ class NotificationService {
       // Get APNS Token for iOS
       if (Platform.isIOS) {
         await Future.delayed(const Duration(seconds: 1)); // Wait a moment
-        String? apnsToken = await _messaging.getAPNSToken();
+        final String? apnsToken = await _messaging.getAPNSToken();
         _logger.d('APNS Token: $apnsToken');
       }
 

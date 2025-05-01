@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
-import '../models/pin.dart';
-import '../services/firebase_service.dart';
-import '../services/storage_service.dart';
-import '../widgets/wall/share_wall_sheet.dart';
-import '../widgets/pin/pin_card.dart';
-import '../widgets/pin/pin_detail_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_reorderable_grid_view/widgets/widgets.dart';
-import '../services/notification_service.dart';
+import 'package:pintopia/models/pin.dart';
+import 'package:pintopia/services/firebase_service.dart';
+import 'package:pintopia/services/notification_service.dart';
+import 'package:pintopia/services/storage_service.dart';
+import 'package:pintopia/widgets/pin/pin_card.dart';
+import 'package:pintopia/widgets/pin/pin_detail_view.dart';
+import 'package:pintopia/widgets/wall/share_wall_sheet.dart';
 
 class WallDetailScreen extends StatefulWidget {
   final String wallId;
@@ -65,7 +65,7 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
         if (wall == null) {
           return Scaffold(
             appBar: AppBar(),
-            body: Center(
+            body: const Center(
               child: Text('Wall nicht gefunden'),
             ),
           );
@@ -124,7 +124,8 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
                   if (pinsSnapshot.hasError) {
                     return Center(
                       child: Text(
-                          'Fehler beim Laden der Pins: ${pinsSnapshot.error}'),
+                        'Fehler beim Laden der Pins: ${pinsSnapshot.error}',
+                      ),
                     );
                   }
 
@@ -150,16 +151,18 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
                   return ReorderableBuilder(
                     enableDraggable: _isEditMode && isAdmin,
                     onReorder: _isEditMode
-                        ? (ReorderedListFunction reorderedListFunction) {
+                        ? (ReorderedListFunction<Pin> reorderedListFunction) {
                             setState(() {
                               final reorderedList = reorderedListFunction(pins);
                               final updates = <Future<void>>[];
                               for (var i = 0; i < reorderedList.length; i++) {
                                 final pin = reorderedList[i];
                                 if (pin.position != i) {
-                                  updates.add(widget.firebaseService.updatePin(
-                                    pin.copyWith(position: i),
-                                  ));
+                                  updates.add(
+                                    widget.firebaseService.updatePin(
+                                      pin.copyWith(position: i),
+                                    ),
+                                  );
                                 }
                               }
                               Future.wait(updates);
@@ -172,18 +175,19 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
                       padding: const EdgeInsets.all(8.0),
                       mainAxisSpacing: 16.0,
                       crossAxisSpacing: 16.0,
-                      childAspectRatio: 1.0,
                       children: children,
                     ),
                     children: pins
-                        .map((pin) => PinCard(
-                              key: ValueKey(pin.id),
-                              pin: pin,
-                              isAdmin: isAdmin,
-                              isEditMode: _isEditMode,
-                              onLongPress: () =>
-                                  setState(() => _isEditMode = true),
-                            ))
+                        .map(
+                          (pin) => PinCard(
+                            key: ValueKey(pin.id),
+                            pin: pin,
+                            isAdmin: isAdmin,
+                            isEditMode: _isEditMode,
+                            onLongPress: () =>
+                                setState(() => _isEditMode = true),
+                          ),
+                        )
                         .toList(),
                   );
                 },

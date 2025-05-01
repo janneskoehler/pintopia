@@ -1,10 +1,11 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'dart:ui' as ui;
-import '../../models/wall.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import '../common/copyable_link.dart';
+import 'package:pintopia/models/wall.dart';
+import 'package:pintopia/widgets/common/copyable_link.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class ShareWallSheet extends StatelessWidget {
   final Wall wall;
@@ -109,12 +110,11 @@ class ShareWallSheet extends StatelessWidget {
                     key: qrKey,
                     child: QrImageView(
                       data: _buildWallLink(),
-                      version: QrVersions.auto,
                       size: 200.0,
                       embeddedImage:
                           const AssetImage('assets/icons/icon_circle.png'),
-                      embeddedImageStyle: QrEmbeddedImageStyle(
-                        size: const Size(50, 50),
+                      embeddedImageStyle: const QrEmbeddedImageStyle(
+                        size: Size(50, 50),
                       ),
                     ),
                   ),

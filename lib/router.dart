@@ -1,11 +1,11 @@
 import 'package:go_router/go_router.dart';
-import 'screens/wall_list_screen.dart';
-import 'screens/wall_detail_screen.dart';
-import 'services/notification_service.dart';
-import 'services/storage_service.dart';
+import 'package:pintopia/screens/wall_detail_screen.dart';
+import 'package:pintopia/screens/wall_list_screen.dart';
+import 'package:pintopia/services/notification_service.dart';
+import 'package:pintopia/services/storage_service.dart';
 
 GoRouter getRouter(
-    NotificationService notificationService, StorageService storageService) {
+    NotificationService notificationService, StorageService storageService,) {
   return GoRouter(
     routes: [
       GoRoute(

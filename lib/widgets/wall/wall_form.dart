@@ -78,7 +78,7 @@ class _WallFormState extends State<WallForm> {
             for (var i = 1; i <= 8; i++)
               InkWell(
                 onTap: () => widget.onAssetImageSelected(
-                    'thumb${i.toString().padLeft(2, '0')}.jpg'),
+                    'thumb${i.toString().padLeft(2, '0')}.jpg',),
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(

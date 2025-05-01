@@ -1,9 +1,10 @@
 version: "0.2"
-language: "en,de"
+language: en,de
 ignorePaths: []
 dictionaryDefinitions: []
 dictionaries: []
 words:
+  - pintopia
   - prefs
 ignoreWords: []
 import: []

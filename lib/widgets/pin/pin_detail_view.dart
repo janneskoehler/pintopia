@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../models/attachment.dart';
-import '../../models/pin.dart';
-import '../../services/firebase_service.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:pintopia/models/attachment.dart';
+import 'package:pintopia/models/pin.dart';
+import 'package:pintopia/services/firebase_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PinDetailView extends StatefulWidget {
   final Pin pin;
@@ -260,7 +260,7 @@ class _PinDetailViewState extends State<PinDetailView> {
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
+                                    horizontal: 16, vertical: 8,),
                                 hintText: 'Titel',
                                 hintStyle: TextStyle(
                                   color: Colors.white54,
@@ -323,7 +323,7 @@ class _PinDetailViewState extends State<PinDetailView> {
                                   ),
                                   InkWell(
                                     onTap: () => launchUrl(Uri.parse(
-                                        'https://www.markdownguide.org/basic-syntax/')),
+                                        'https://www.markdownguide.org/basic-syntax/',),),
                                     child: const Text(
                                       'Markdown wird unterstützt. Klicke hier für eine Anleitung.',
                                       style: TextStyle(
@@ -379,7 +379,7 @@ class _PinDetailViewState extends State<PinDetailView> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(
-                                          'Der Link konnte nicht geöffnet werden'),
+                                          'Der Link konnte nicht geöffnet werden',),
                                     ),
                                   );
                                 }

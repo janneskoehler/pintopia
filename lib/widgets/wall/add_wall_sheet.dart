@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'wall_form.dart';
-import '../../services/firebase_service.dart';
-import '../../services/storage_service.dart';
-import '../common/sheet_bar.dart';
+import 'package:pintopia/services/firebase_service.dart';
+import 'package:pintopia/services/storage_service.dart';
+import 'package:pintopia/widgets/common/sheet_bar.dart';
+import 'package:pintopia/widgets/wall/wall_form.dart';
 
 class AddWallSheet extends StatefulWidget {
   const AddWallSheet({super.key, required this.storageService});
@@ -123,7 +123,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
     }
   }
 
-  void _openExistingWall() async {
+  Future<void> _openExistingWall() async {
     if (idController.text.isEmpty) return;
 
     String? wallId;
@@ -210,7 +210,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(height: 200),
+                      const SizedBox(height: 200),
                       FilledButton.tonal(
                         onPressed: () => _goToNextPage(true),
                         style: FilledButton.styleFrom(
@@ -218,10 +218,10 @@ class _AddWallSheetState extends State<AddWallSheet> {
                         ),
                         child: const Text('Neue Pinnwand erstellen'),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16.0),
                         child: Row(
-                          children: const [
+                          children: [
                             Expanded(child: Divider()),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16.0),
