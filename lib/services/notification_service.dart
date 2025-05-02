@@ -44,24 +44,20 @@ class NotificationService {
 
     try {
       // Request permissions
-      final NotificationSettings settings = await _messaging.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-        provisional: false,
-      );
+      final NotificationSettings settings =
+          await _messaging.requestPermission();
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         // First register for Remote Notifications
         await _messaging.setAutoInitEnabled(true);
 
         // Get the token
-        String? token = await _messaging.getToken();
+        final String? token = await _messaging.getToken();
         _logger.d('Firebase Messaging token: $token');
 
         // Get APNS Token for iOS
         if (Platform.isIOS) {
-          String? apnsToken = await _messaging.getAPNSToken();
+          final String? apnsToken = await _messaging.getAPNSToken();
           _logger.d('APNS Token: $apnsToken');
         }
 
@@ -69,11 +65,14 @@ class NotificationService {
         await _subscribeToTopics();
 
         // Handle background messages
-        FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+        FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler,
+        );
 
         // Handle foreground messages
         FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-          _logger.d('Received foreground message: ${message.notification?.title}');
+          _logger
+              .d('Received foreground message: ${message.notification?.title}');
           // Handle the message as needed
         });
 
@@ -95,19 +94,27 @@ class NotificationService {
   }
 
   @pragma('vm:entry-point')
-  static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  static Future<void> _firebaseMessagingBackgroundHandler(
+    RemoteMessage message,
+  ) async {
+    final logger = Logger(
+      printer: PrettyPrinter(
+        dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
+      ),
+    );
     // Handle background message
-    print('Handling background message: ${message.notification?.title}');
+    logger.d('Handling background message: ${message.notification?.title}');
   }
 
   Future<void> _subscribeToTopics() async {
     try {
       // Subscribe to general topics
       await _messaging.subscribeToTopic('general');
-      
+
       // Subscribe to any specific topics based on user preferences
-      final List<String> subscribedWalls = _prefs.getStringList('subscribed_walls') ?? [];
-      for (String wallId in subscribedWalls) {
+      final List<String> subscribedWalls =
+          _prefs.getStringList('subscribed_walls') ?? [];
+      for (final String wallId in subscribedWalls) {
         await _messaging.subscribeToTopic('wall_$wallId');
       }
     } catch (e) {
@@ -134,6 +141,4 @@ class NotificationService {
     await _messaging.unsubscribeFromTopic('wall_$wallId');
     await _prefs.setBool('subscribed_$wallId', false);
   }
-
-
 }
