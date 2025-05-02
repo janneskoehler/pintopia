@@ -94,12 +94,16 @@ class _WallListScreenState extends State<WallListScreen> {
                   (wall) => Card(
                     clipBehavior: Clip.antiAlias,
                     child: InkWell(
-                      onTap: () {
+                      onTap: () async {
                         if (!_isEditMode) {
-                          context.goNamed(
-                            'wall-detail',
-                            pathParameters: {'id': wall.id},
-                          );
+                          await widget.storageService
+                              .setWallLastOpened(wall.id);
+                          if (context.mounted) {
+                            context.goNamed(
+                              'wall-detail',
+                              pathParameters: {'id': wall.id},
+                            );
+                          }
                         }
                       },
                       onLongPress: _toggleEditMode,
@@ -115,33 +119,43 @@ class _WallListScreenState extends State<WallListScreen> {
                                         'assets/images/${wall.assetImageName}',
                                         fit: BoxFit.cover,
                                       )
-                                    : Image.network(
-                                        wall.imageUrl ?? '',
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return const Center(
-                                            child: Icon(
-                                              Icons.image_not_supported,
-                                              size: 50,
+                                    : wall.imageUrl != null
+                                        ? Image.network(
+                                            wall.imageUrl!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return const Center(
+                                                child: Icon(
+                                                  Icons.image_not_supported,
+                                                  size: 50,
+                                                ),
+                                              );
+                                            },
+                                          )
+                                        : Container(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primaryContainer,
+                                            child: const Center(
+                                              child: Icon(
+                                                Icons.image_not_supported,
+                                                size: 50,
+                                              ),
                                             ),
-                                          );
-                                        },
-                                      ),
+                                          ),
                               ),
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Center(
-                                    child: Text(
-                                      wall.title,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineSmall,
-                                      textAlign: TextAlign.center,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                              Container(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Center(
+                                  child: Text(
+                                    wall.title,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
@@ -176,11 +190,47 @@ class _WallListScreenState extends State<WallListScreen> {
                                 );
                               },
                             ),
+                          FutureBuilder<int>(
+                            future: wall.countNewPinsSinceLastVisit(
+                              widget.storageService,
+                            ),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return const SizedBox();
+                              }
+
+                              if (snapshot.data! > 0) {
+                                return Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      snapshot.data.toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return const SizedBox();
+                            },
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
+
                 // New Wall Element
                 Card(
                   clipBehavior: Clip.antiAlias,

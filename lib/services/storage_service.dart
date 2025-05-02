@@ -18,6 +18,7 @@ class StorageService {
   static const String _lastWallKey = 'last_wall_id';
   static const String _wallsKey = 'wall_ids';
   static const String _adminWallsKey = 'admin_wall_ids';
+  static const String _lastOpenedWallKey = 'last_opened_wall_';
 
   final SharedPreferences _prefs;
   final Logger _logger = Logger(
@@ -67,6 +68,20 @@ class StorageService {
       () async => _prefs.setString(_lastWallKey, wallId),
       operationName: 'save last wall ID',
     );
+  }
+
+  Future<void> setLastWall(String wallId) async {
+    await _prefs.setString(_lastWallKey, wallId);
+  }
+
+  Future<void> setWallLastOpened(String wallId) async {
+    await _prefs.setString('$_lastOpenedWallKey$wallId', DateTime.now().toIso8601String());
+  }
+
+  Future<DateTime?> getLastOpenedWallTime(String wallId) async {
+    final String? lastOpened = _prefs.getString('$_lastOpenedWallKey$wallId');
+    if (lastOpened == null) return null;
+    return DateTime.parse(lastOpened);
   }
 
   Future<String?> getLastWallId() async {

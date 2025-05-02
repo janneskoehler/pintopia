@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:pintopia/services/storage_service.dart';
 
 part 'wall.g.dart';
 
@@ -17,6 +19,20 @@ class Wall {
     final random = Random();
     return List.generate(10, (index) => chars[random.nextInt(chars.length)])
         .join();
+  }
+
+  Future<int> countNewPinsSinceLastVisit(StorageService storageService) async {
+    final lastOpened = await storageService.getLastOpenedWallTime(id);
+    if (lastOpened == null) return 0;
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('walls')
+        .doc(id)
+        .collection('pins')
+        .where('createdAt', isGreaterThan: lastOpened)
+        .get();
+
+    return snapshot.docs.length;
   }
 
   Wall({
