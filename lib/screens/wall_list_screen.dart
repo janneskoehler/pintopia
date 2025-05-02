@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pintopia/models/wall.dart';
 import 'package:pintopia/services/firebase_service.dart';
 import 'package:pintopia/services/storage_service.dart';
+import 'package:pintopia/widgets/wall/add_wall_card.dart';
 import 'package:pintopia/widgets/wall/add_wall_sheet.dart';
 import 'package:pintopia/widgets/wall/edit_wall_sheet.dart';
 import 'package:pintopia/widgets/wall/wall_card.dart';
@@ -101,45 +102,8 @@ class _WallListScreenState extends State<WallListScreen> {
                 ),
 
                 // New Wall Element
-                Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onTap: () => _showWallSheet(context),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: ColoredBox(
-                            color:
-                                Theme.of(context).colorScheme.primaryContainer,
-                            child: Icon(
-                              Icons.add,
-                              size: 48,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Center(
-                              child: Text(
-                                'Pinnwand hinzufügen',
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall,
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                AddWallCard(
+                  onTap: _showWallSheet,
                 ),
               ],
             ),
