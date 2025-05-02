@@ -22,12 +22,21 @@ export const onPinCreated = functions.firestore.onDocumentCreated(
     const wallTitle = wallData?.title || "Pinnwand";
     const pinTitle = snap?.data()?.title || "Pin";
 
+    const notificationTopic = `wall_${wallId}`;
+    console.log(`Sending notification to topic: ${notificationTopic}`);
+    console.log(`Notification details: title="${wallTitle}", `);
+    console.log(`body="${pinTitle}" `);
+    console.log("wurde zur Pinnwand hinzugefügt");
+
     await admin.messaging().send({
-      topic: `wall_${wallId}`,
+      topic: notificationTopic,
       notification: {
         title: `Neuer Pin in "${wallTitle}"`,
         body: `"${pinTitle}" wurde zur Pinnwand hinzugefügt`,
       },
     });
+    console.log(
+      `Notification sent successfully to topic: ${notificationTopic}`
+    );
   }
 );
