@@ -25,7 +25,7 @@ class AddWallSheet extends StatefulWidget {
 
 class _AddWallSheetState extends State<AddWallSheet> {
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController idController = TextEditingController();
+  final TextEditingController wallLinkController = TextEditingController();
   final PageController pageController = PageController();
   String? selectedAssetImage;
   bool isCreatingNew = true;
@@ -35,7 +35,7 @@ class _AddWallSheetState extends State<AddWallSheet> {
   @override
   void dispose() {
     nameController.dispose();
-    idController.dispose();
+    wallLinkController.dispose();
     pageController.dispose();
     super.dispose();
   }
@@ -124,30 +124,97 @@ class _AddWallSheetState extends State<AddWallSheet> {
   }
 
   Future<void> _openExistingWall() async {
-    if (idController.text.isEmpty) return;
+    if (wallLinkController.text.isEmpty) return;
 
     String? wallId;
     String? adminCode;
 
     try {
-      final uri = Uri.parse(idController.text);
-      final segments = uri.pathSegments;
-      if (segments.length >= 2 && segments[0] == 'wall') {
-        wallId = segments[1];
-        adminCode = uri.queryParameters['a'];
+      // Clean up the input by removing any '#/' prefix that might confuse the URI parser
+      String cleanedInput = wallLinkController.text;
+      if (cleanedInput.contains('#/')) {
+        cleanedInput = cleanedInput.replaceAll('#/', '');
+      }
+
+      final uri = Uri.parse(cleanedInput);
+
+      // Check if it's in the format https://app.pintopia.org/wall/{wallId}
+      if (uri.host == 'app.pintopia.org') {
+        final pathSegments = uri.pathSegments;
+
+        if (pathSegments.length >= 2 && pathSegments[0] == 'wall') {
+          wallId = pathSegments[1];
+          adminCode = uri.queryParameters['a'];
+        }
+      }
+
+      // Show alert if no valid wallId was found
+      if (wallId == null) {
+        // Show alert for incorrect URL format
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Ungültiges Format'),
+                content: const Text(
+                  'Der Link hat nicht das richtige Format. Bitte verwende einen Link der Form: https://app.pintopia.org/#/wall/...',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+        return;
       }
     } catch (e) {
-      // Try to use direct input as wallId
-      wallId = idController.text;
+      // Show alert for invalid URI
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Ungültiger Link'),
+              content: const Text(
+                'Der eingegebene Link ist ungültig. Bitte überprüfe den Link und versuche es erneut.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+      return;
     }
-
-    if (wallId == null) return;
 
     final wall = await _firebaseService.getWall(wallId);
     if (wall == null) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pinnwand nicht gefunden')),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Pinnwand nicht gefunden'),
+            content: const Text(
+              'Die angegebene Pinnwand konnte nicht gefunden werden. Bitte überprüfe den Link und versuche es erneut.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
       );
       return;
     }
@@ -254,26 +321,11 @@ class _AddWallSheetState extends State<AddWallSheet> {
                           },
                         )
                       : TextField(
-                          controller: idController,
+                          controller: wallLinkController,
                           decoration: const InputDecoration(
                             labelText: 'Pinnwand Link',
-                            hintText: 'https://app.pintopia.org/wall/...',
+                            hintText: 'https://app.pintopia.org/#/wall/...',
                           ),
-                          onChanged: (value) {
-                            try {
-                              final uri = Uri.parse(value);
-                              final segments = uri.pathSegments;
-                              if (segments.length >= 2 &&
-                                  segments[0] == 'wall') {
-                                final adminCode = uri.queryParameters['a'];
-                                if (adminCode != null) {
-                                  // Handle admin code
-                                }
-                              }
-                            } catch (e) {
-                              // Invalid URL format
-                            }
-                          },
                         ),
                 ),
               ],
