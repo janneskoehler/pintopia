@@ -22,6 +22,7 @@ class NotificationServiceException implements Exception {
 }
 
 class NotificationService {
+  static const String subscribedWallIdsKey = 'subscribed_wall_ids';
   final FirebaseMessaging _messaging;
   final SharedPreferences _prefs;
   final Logger _logger = Logger(
@@ -113,9 +114,10 @@ class NotificationService {
 
       // Subscribe to any specific topics based on user preferences
       final List<String> subscribedWalls =
-          _prefs.getStringList('subscribed_walls') ?? [];
+          _prefs.getStringList(subscribedWallIdsKey) ?? [];
       for (final String wallId in subscribedWalls) {
         await _messaging.subscribeToTopic('wall_$wallId');
+        _logger.d('Subscribed to topic: wall_$wallId');
       }
     } catch (e) {
       _logger.e('Failed to subscribe to topics: $e');
@@ -128,17 +130,29 @@ class NotificationService {
       return;
     }
 
-    final key = 'subscribed_$wallId';
-    final alreadySubscribed = _prefs.getBool(key) ?? false;
+    // Get current subscribed walls
+    final subscribedWalls = _prefs.getStringList(subscribedWallIdsKey) ?? [];
 
-    if (!alreadySubscribed) {
+    // Check if already subscribed
+    if (!subscribedWalls.contains(wallId)) {
+      // Subscribe to the topic
       await _messaging.subscribeToTopic('wall_$wallId');
-      await _prefs.setBool(key, true);
+      _logger.d('Subscribed to topic: wall_$wallId');
+
+      // Add to the list and save
+      subscribedWalls.add(wallId);
+      await _prefs.setStringList(subscribedWallIdsKey, subscribedWalls);
     }
   }
 
   Future<void> unsubscribeFromWall(String wallId) async {
+    // Unsubscribe from the topic
     await _messaging.unsubscribeFromTopic('wall_$wallId');
-    await _prefs.setBool('subscribed_$wallId', false);
+    _logger.d('Unsubscribed from topic: wall_$wallId');
+
+    // Remove from the list and save
+    final subscribedWalls = _prefs.getStringList(subscribedWallIdsKey) ?? [];
+    subscribedWalls.remove(wallId);
+    await _prefs.setStringList(subscribedWallIdsKey, subscribedWalls);
   }
 }
