@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pintopia/models/attachment.dart';
 import 'package:pintopia/models/pin.dart';
+import 'package:pintopia/services/device_service.dart';
 import 'package:pintopia/widgets/pin/pin_detail_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -94,14 +95,12 @@ class PinCard extends StatelessWidget {
                     foregroundColor: Colors.black87,
                   ),
                   onPressed: () {
-                    showDialog(
+                    DeviceService.showResponsiveBottomSheet(
                       context: context,
-                      builder: (context) => Dialog(
-                        child: PinDetailView(
-                          pin: pin,
-                          isAdmin: true,
-                          initialEditMode: true,
-                        ),
+                      child: PinDetailView(
+                        pin: pin,
+                        isAdmin: true,
+                        initialEditMode: true,
                       ),
                     );
                   },
@@ -137,13 +136,12 @@ class PinCard extends StatelessWidget {
         await launchUrl(url);
       }
     } else {
-      showDialog(
+      // Use the responsive bottom sheet service to show the pin detail
+      await DeviceService.showResponsiveBottomSheet(
         context: context,
-        builder: (context) => Dialog(
-          child: PinDetailView(
-            pin: pin,
-            isAdmin: isAdmin,
-          ),
+        child: PinDetailView(
+          pin: pin,
+          isAdmin: isAdmin,
         ),
       );
     }

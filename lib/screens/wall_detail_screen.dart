@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_reorderable_grid_view/widgets/widgets.dart';
 import 'package:pintopia/models/pin.dart';
+import 'package:pintopia/services/device_service.dart';
 import 'package:pintopia/services/firebase_service.dart';
 import 'package:pintopia/services/notification_service.dart';
 import 'package:pintopia/services/storage_service.dart';
@@ -226,14 +227,12 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
       updatedAt: now,
     );
 
-    showDialog(
+    DeviceService.showResponsiveBottomSheet(
       context: context,
-      builder: (context) => Dialog(
-        child: PinDetailView(
-          pin: newPin,
-          isAdmin: true,
-          initialEditMode: true,
-        ),
+      child: PinDetailView(
+        pin: newPin,
+        isAdmin: true,
+        initialEditMode: true,
       ),
     );
   }
