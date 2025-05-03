@@ -9,6 +9,7 @@ class PinCard extends StatelessWidget {
   final bool isAdmin;
   final bool isEditMode;
   final VoidCallback? onLongPress;
+  final bool isNew;
 
   const PinCard({
     super.key,
@@ -16,6 +17,7 @@ class PinCard extends StatelessWidget {
     this.isAdmin = false,
     this.isEditMode = false,
     this.onLongPress,
+    this.isNew = false,
   });
 
   @override
@@ -103,6 +105,19 @@ class PinCard extends StatelessWidget {
                       ),
                     );
                   },
+                ),
+              ),
+            if (isNew)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
                 ),
               ),
           ],

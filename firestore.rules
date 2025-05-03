@@ -2,8 +2,12 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /walls/{wallId} {
-      allow read: if true;
-      allow write: if true;  // TODO: Füge später entsprechende Authentifizierung hinzu
+      // Only allows reading a specific wall by ID
+      allow get: if true;
+      // Prevents listing all walls
+      allow list: if false;
+      // Temporarily allow all write operations
+      allow write: if true;  // TODO: Add proper authentication later
     }
   }
 } 
