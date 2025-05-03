@@ -28,15 +28,26 @@ class WallDetailScreen extends StatefulWidget {
 
 class _WallDetailScreenState extends State<WallDetailScreen> {
   bool _isEditMode = false;
+  DateTime? _lastOpenedTime;
 
   @override
   void initState() {
     super.initState();
     _subscribeToNotifications();
+    _loadLastOpenedTimeAndUpdateTimestamp();
   }
 
   Future<void> _subscribeToNotifications() async {
     await widget.notificationService.subscribeToWall(widget.wallId);
+  }
+
+  Future<void> _loadLastOpenedTimeAndUpdateTimestamp() async {
+    // Read the last opening timestamp from storage
+    _lastOpenedTime =
+        await widget.storageService.getLastOpenedWallTime(widget.wallId);
+    if (_lastOpenedTime != null) {
+      widget.storageService.setWallLastOpened(widget.wallId);
+    }
   }
 
   @override
@@ -185,7 +196,9 @@ class _WallDetailScreenState extends State<WallDetailScreen> {
                             isAdmin: isAdmin,
                             isEditMode: _isEditMode,
                             onLongPress: () =>
-                                setState(() => _isEditMode = true),
+                                setState(() => _isEditMode = !_isEditMode),
+                            isNew: _lastOpenedTime != null &&
+                                pin.createdAt.isAfter(_lastOpenedTime!),
                           ),
                         )
                         .toList(),

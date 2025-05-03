@@ -29,7 +29,6 @@ class WallCard extends StatelessWidget {
           child: InkWell(
             onTap: () async {
               if (!isEditMode) {
-                await storageService.setWallLastOpened(wall.id);
                 if (context.mounted) {
                   context.goNamed(
                     'wall-detail',

@@ -107,16 +107,20 @@ class PinCard extends StatelessWidget {
                   },
                 ),
               ),
-            if (isNew)
+            if (isNew && !isEditMode)
               Positioned(
                 top: 8,
                 right: 8,
                 child: Container(
-                  width: 10,
-                  height: 10,
+                  width: 16,
+                  height: 16,
                   decoration: BoxDecoration(
                     color: Colors.red,
                     shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 2,
+                    ),
                   ),
                 ),
               ),
